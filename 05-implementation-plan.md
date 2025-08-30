@@ -742,11 +742,22 @@ pie title Total Project Budget: $327,500
 #### **Phase-wise Budget Breakdown**
 
 ```mermaid
-xychart-beta
-    title "Budget Allocation by Phase (USD)"
-    x-axis ["Phase 1", "Phase 2", "Phase 3", "Phase 4"]
-    y-axis "Budget ($)" 0 --> 120000
-    bar [55000, 76000, 89500, 107000]
+gantt
+    title Budget Allocation by Phase (USD)
+    dateFormat  X
+    axisFormat  %s
+    
+    section Phase 1: $55K
+    Budget Allocation    :55, 0, 1
+    
+    section Phase 2: $76K
+    Budget Allocation    :76, 1, 2
+    
+    section Phase 3: $89.5K
+    Budget Allocation    :89, 2, 3
+    
+    section Phase 4: $107K
+    Budget Allocation    :107, 3, 4
 ```
 
 #### **Budget Category Analysis**
