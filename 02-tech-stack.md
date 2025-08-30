@@ -119,6 +119,34 @@ The health tech platform follows a **microservices architecture** with modular f
 - **Features**: Push notifications, email, SMS coordination
 - **Communication**: gRPC streaming for real-time notification delivery
 
+#### **7. Electronic Health Records (EHR) Service**
+- **Framework**: Tonic gRPC service with FHIR R4 compliance
+- **Purpose**: Comprehensive health record management and storage
+- **Features**: FHIR-compliant data storage, document management, secure sharing, audit logging
+- **Integrations**: FHIR R4 server, medical imaging support, lab result integration
+- **Communication**: gRPC for structured data operations, secure file transfer protocols
+
+#### **8. Discussion Forum Service**
+- **Framework**: Tonic gRPC service with real-time messaging patterns
+- **Purpose**: Community features and patient-provider communication
+- **Features**: Threaded discussions, moderation tools, search functionality, real-time chat
+- **Integrations**: Notification service for real-time updates, IAM for permissions
+- **Communication**: gRPC with WebSocket support for real-time messaging
+
+#### **9. UHI Gateway Service**
+- **Framework**: Tonic gRPC service with UHI protocol implementation
+- **Purpose**: Universal Health Interface protocol compliance and integration
+- **Features**: UHI message routing, ed25519 cryptographic signing, network registry integration
+- **Standards**: Full UHI protocol compliance, ABDM integration, healthcare interoperability
+- **Communication**: gRPC for internal communication, HTTP/JSON for UHI protocol endpoints
+
+#### **10. Analytics Service**
+- **Framework**: Tonic gRPC service with data processing pipelines
+- **Purpose**: Advanced analytics, reporting, and business intelligence
+- **Features**: Real-time dashboards, custom report generation, predictive analytics, data visualization
+- **Integrations**: All microservices for data collection, external BI tools
+- **Communication**: gRPC for data queries, WebSocket for real-time dashboard updates
+
 ---
 
 ## **Database & Storage**
@@ -164,9 +192,22 @@ The health tech platform follows a **microservices architecture** with modular f
 
 ### **Client-Server Communication**
 - **REST APIs**: BFF service exposes REST APIs to frontend clients
-- **gRPC-Web**: Direct gRPC communication for advanced web clients
+- **gRPC-Web**: Direct gRPC communication for advanced web clients (implemented in Phase 2)
 - **WebSocket**: For real-time features (chat, notifications) exposed by BFF
-- **GraphQL**: Optional for complex data fetching requirements via BFF
+- **GraphQL**: Complex data fetching for analytics dashboard (implemented in Phase 2)
+
+#### **GraphQL Implementation Details**
+- **Framework**: Async-GraphQL for Rust-based GraphQL server
+- **Schema**: Auto-generated from gRPC service definitions
+- **Features**: Real-time subscriptions, DataLoader pattern for N+1 prevention
+- **Use Cases**: Analytics dashboard, complex reporting queries, admin interfaces
+- **Integration**: BFF service acts as GraphQL gateway, translating to gRPC calls
+
+#### **gRPC-Web Implementation Details**
+- **Framework**: Tonic-Web for direct browser-to-service communication
+- **Features**: Streaming support, TypeScript client generation, CORS handling
+- **Use Cases**: Advanced web clients requiring real-time data streams
+- **Security**: JWT authentication, same security model as REST APIs
 
 ### **Message Queue**
 - **Redis Pub/Sub**: For simple event broadcasting
@@ -183,9 +224,28 @@ The health tech platform follows a **microservices architecture** with modular f
 - **Multi-Factor Authentication**: TOTP and SMS-based MFA
 
 ### **Authorization**
-- **Role-Based Access Control (RBAC)**: Fine-grained permissions
-- **Attribute-Based Access Control (ABAC)**: Context-aware permissions
-- **API Key Management**: For service-to-service authentication
+- **Role-Based Access Control (RBAC)**: Fine-grained permissions for user roles (patient, provider, admin, staff)
+- **Attribute-Based Access Control (ABAC)**: Context-aware permissions based on user attributes, resource properties, and environmental factors
+- **API Key Management**: Secure service-to-service authentication with rotation and scope management
+
+#### **RBAC Implementation Details**
+- **Roles**: Patient, Healthcare Provider, Clinic Admin, Hospital Admin, System Admin
+- **Permissions**: Granular permissions for each resource and operation
+- **Inheritance**: Hierarchical role inheritance for efficient permission management
+- **Dynamic Assignment**: Runtime role assignment based on organization membership
+
+#### **ABAC Implementation Details**
+- **Attributes**: User (role, department, clearance), Resource (type, sensitivity, owner), Environment (time, location, device)
+- **Policies**: XACML-inspired policy language for complex authorization rules
+- **Decision Engine**: Real-time policy evaluation with caching for performance
+- **Use Cases**: Healthcare data access based on patient consent, time-based access, location-restricted operations
+
+#### **API Key Management Details**
+- **Key Types**: Service keys, application keys, temporary access keys
+- **Scopes**: Fine-grained scopes for different API endpoints and operations
+- **Rotation**: Automatic key rotation with configurable intervals
+- **Monitoring**: Comprehensive logging and monitoring of API key usage
+- **Revocation**: Immediate key revocation with distributed cache invalidation
 
 ### **Security Measures**
 - **HTTPS Everywhere**: TLS 1.3 for all communications
@@ -231,9 +291,11 @@ The health tech platform follows a **microservices architecture** with modular f
 - **Authentication**: ed25519 cryptographic signing for UHI messages
 
 ### **Healthcare Standards**
-- **FHIR Compliance**: Future support for FHIR R4 standards
-- **ABDM Integration**: National Digital Health Mission compliance
-- **Data Privacy**: HIPAA-equivalent privacy measures
+- **FHIR Compliance**: FHIR R4 standards implemented in EHR Service (Phase 1, Month 3)
+- **ABDM Integration**: National Digital Health Mission compliance (Phase 3)
+- **Data Privacy**: HIPAA-equivalent privacy measures with audit logging
+- **Medical Imaging**: DICOM support for radiology integration (Phase 2)
+- **Lab Integration**: HL7 messaging for laboratory results (Phase 2)
 
 ---
 

@@ -123,18 +123,22 @@ flowchart TD
 - Implement user registration and authentication
 - Set up JWT token generation and validation
 - Create role-based access control (RBAC) system
+- Implement Attribute-Based Access Control (ABAC) foundation
 - Implement password reset and MFA
+- Set up API key management service
 
 **Deliverables:**
-- ✅ User registration and login APIs
-- ✅ JWT-based authentication system
-- ✅ RBAC with user roles (patient, provider, admin)
+- ✅ Production-ready user registration and login APIs
+- ✅ JWT-based authentication system with RS256 signing
+- ✅ RBAC with comprehensive user roles (patient, provider, clinic admin, hospital admin, system admin)
+- ✅ ABAC foundation with policy engine for context-aware permissions
 - ✅ Password reset flow with email verification
-- ✅ MFA setup using TOTP
+- ✅ MFA setup using TOTP and SMS-based methods
+- ✅ API key management service with rotation and scope management
 
 **Dependencies:** Infrastructure setup
 **Team:** Backend Team (2 developers)
-**Estimated Effort:** 120 hours
+**Estimated Effort:** 140 hours (enhanced with AI assistance)
 
 **Key APIs:**
 ```
@@ -347,39 +351,70 @@ POST /providers/{id}/slots
 
 ### **Phase 3.1: Essential Features & Integration (Month 7)**
 
-#### **Week 25-26: Core Healthcare Features**
+#### **Week 25-26: EHR Service & Discussion Forum**
 **Tasks:**
-- Implement basic EHR storage and retrieval
-- Add notification system (email, SMS)
-- Set up real-time WebSocket connections
-- Create basic analytics dashboard
+- Implement production-ready EHR service with FHIR R4 compliance
+- Build discussion forum service for community features
+- Set up advanced analytics service for comprehensive reporting
+- Implement secure document sharing and medical history management
 
 **Deliverables:**
-- ✅ Basic EHR system with document upload
-- ✅ Multi-channel notification service
-- ✅ Real-time notifications for appointments
-- ✅ Provider analytics dashboard
+- ✅ Production-ready EHR service with FHIR R4 compliance
+- ✅ FHIR-compliant data storage and structured medical records
+- ✅ Secure document management and sharing system
+- ✅ Discussion forum service with threaded discussions and moderation
+- ✅ Advanced analytics service with real-time dashboards
+- ✅ Medical history timeline and comprehensive patient profiles
 
-**Dependencies:** Core platform functionality
-**Team:** 2 developers (Lead + Dev 2)
-**Estimated Effort:** 160 hours (with AI assistance)
+**Dependencies:** Core platform functionality, IAM service
+**Team:** 2 developers (Lead + Dev 2) + External FHIR specialist
+**Estimated Effort:** 180 hours (enhanced scope with AI assistance)
 
-#### **Week 27-28: UHI Integration & Compliance**
+**Key APIs:**
+```
+POST /ehr/patients/{id}/records
+GET /ehr/patients/{id}/history
+POST /ehr/documents/upload
+GET /ehr/documents/{id}/share
+POST /forum/discussions
+POST /forum/discussions/{id}/replies
+GET /analytics/dashboard/provider/{id}
+GET /analytics/reports/custom
+```
+
+#### **Week 27-28: UHI Gateway Service & Advanced Features**
 **Tasks:**
-- Implement UHI protocol compliance
-- Integrate with payment gateway webhooks
-- Set up basic teleconsultation (optional)
-- Complete data privacy measures
+- Implement dedicated UHI Gateway Service with ed25519 cryptographic signing
+- Set up advanced teleconsultation with screen sharing and session recording
+- Integrate GraphQL endpoint for complex analytics queries
+- Complete comprehensive data privacy and compliance measures
+- Implement real-time notification system with multi-channel support
 
 **Deliverables:**
-- ✅ UHI protocol implementation
-- ✅ Payment gateway full integration
-- ✅ Basic video calling (WebRTC)
-- ✅ Healthcare data privacy compliance
+- ✅ Production-ready UHI Gateway Service with full protocol compliance
+- ✅ ed25519 cryptographic signing for UHI message authentication
+- ✅ Advanced teleconsultation platform with screen sharing and session recording
+- ✅ GraphQL endpoint for complex data fetching and analytics
+- ✅ Real-time multi-channel notification system (email, SMS, push, WebSocket)
+- ✅ Comprehensive healthcare data privacy compliance (HIPAA-equivalent)
+- ✅ ABDM integration for National Digital Health Mission compliance
 
-**Dependencies:** Appointment system, payment integration
-**Team:** 2 developers + External compliance consultant
-**Estimated Effort:** 180 hours
+**Dependencies:** Appointment system, payment integration, EHR service
+**Team:** 2 developers + External UHI compliance consultant + FHIR specialist
+**Estimated Effort:** 200 hours (enhanced scope with AI assistance)
+
+**Key APIs:**
+```
+POST /uhi/search
+POST /uhi/select
+POST /uhi/init
+POST /uhi/confirm
+GET /teleconsultation/room/{id}
+POST /teleconsultation/session/record
+GET /graphql (analytics and complex queries)
+POST /notifications/send
+GET /compliance/audit/{id}
+```
 
 ### **Phase 3.2: Security, Testing & Launch (Month 8)**
 

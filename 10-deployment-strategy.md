@@ -58,6 +58,9 @@ graph TB
             PAY[Payment Service<br/>gRPC]
             NOT[Notification Service<br/>gRPC]
             DISC[Discussion Forum<br/>gRPC]
+            EHR[EHR Service<br/>gRPC + FHIR R4]
+            UHI_GW[UHI Gateway<br/>gRPC + ed25519]
+            ANALYTICS[Analytics Service<br/>gRPC + GraphQL]
         end
         
         subgraph "Data Layer"
@@ -92,6 +95,9 @@ graph TB
     BFF -.->|gRPC| PAY
     BFF -.->|gRPC| NOT
     BFF -.->|gRPC| DISC
+    BFF -.->|gRPC| EHR
+    BFF -.->|gRPC| UHI_GW
+    BFF -.->|gRPC| ANALYTICS
     
     IAM --> SUPA
     ORG --> SUPA
@@ -99,12 +105,18 @@ graph TB
     PAY --> SUPA
     NOT --> REDIS
     DISC --> SUPA
+    EHR --> SUPA
+    UHI_GW --> SUPA
+    ANALYTICS --> SUPA
+    ANALYTICS --> REDIS
     
     BFF --> REDIS
     
     ORG --> UHI
     PAY --> PAYMENT_GW
     NOT --> SMS
+    UHI_GW --> UHI
+    EHR -.->|FHIR R4| UHI_GW
     
     PROM -.-> GRAF
     JAEGER -.-> GRAF
@@ -356,6 +368,18 @@ spec:
 #### **7. Discussion Forum**
 - **Purpose:** Community features and patient-provider communication
 - **Key Features:** Threaded discussions, moderation, search
+
+#### **8. EHR Service**
+- **Purpose:** Electronic Health Records management with FHIR R4 compliance
+- **Key Features:** Patient records, clinical data, interoperability, data standardization
+
+#### **9. UHI Gateway Service**
+- **Purpose:** Universal Health Interface integration and ed25519 cryptographic signing
+- **Key Features:** UHI protocol compliance, secure message signing, healthcare network connectivity
+
+#### **10. Analytics Service**
+- **Purpose:** Advanced analytics with GraphQL endpoint for complex queries
+- **Key Features:** Data analytics, reporting, GraphQL API, real-time insights
 
 ### **Service Mesh Configuration**
 Deploy Linkerd or Istio for:
@@ -1590,6 +1614,33 @@ resource_allocation:
     limits:
       cpu: "500m"
       memory: "512Mi"
+    replicas: 2
+    
+  ehr_service:
+    requests:
+      cpu: "150m"
+      memory: "384Mi"
+    limits:
+      cpu: "750m"
+      memory: "768Mi"
+    replicas: 3
+    
+  uhi_gateway:
+    requests:
+      cpu: "100m"
+      memory: "256Mi"
+    limits:
+      cpu: "500m"
+      memory: "512Mi"
+    replicas: 2
+    
+  analytics_service:
+    requests:
+      cpu: "200m"
+      memory: "512Mi"
+    limits:
+      cpu: "1000m"
+      memory: "1Gi"
     replicas: 2
     
   supabase_postgres:
