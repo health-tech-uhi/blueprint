@@ -68,50 +68,56 @@ The health tech platform follows a **microservices architecture** with modular f
 - **Rust**: Primary backend language for performance and safety
 - **Version**: Rust 1.70+ with 2021 edition
 
-### **Web Frameworks**
-- **Axum**: Modern, ergonomic web framework for HTTP APIs
-- **Tonic**: High-performance gRPC framework
-- **Tower**: Middleware and service abstractions
+### **gRPC Framework**
+- **Tonic**: High-performance gRPC framework for Rust
+- **Tower**: Middleware and service abstractions for gRPC services
+- **Prost**: Protocol Buffers implementation for Rust
 
 **Why Rust?**
 - Memory safety without garbage collection
 - Zero-cost abstractions for high performance
 - Excellent concurrency support with async/await
 - Strong type system prevents many runtime errors
-- Growing ecosystem for web development
+- Growing ecosystem for gRPC and microservices
 
 ### **Backend Services Architecture**
 
 #### **1. Backend-for-Frontend (BFF)**
-- **Framework**: Axum with Tower middleware
-- **Purpose**: Aggregates and optimizes data for specific clients
-- **Features**: Request routing, response transformation, caching
+- **Framework**: Tonic gRPC service with Tower middleware
+- **Purpose**: Aggregates and optimizes data for specific clients via gRPC
+- **Features**: gRPC request routing, response transformation, caching
+- **Client Communication**: Exposes REST APIs to frontend clients while using gRPC internally
 
 #### **2. Identity and Access Management (IAM)**
-- **Framework**: Axum with custom auth middleware
+- **Framework**: Tonic gRPC service with custom auth interceptors
 - **Authentication**: JWT tokens with RS256 signing
 - **Authorization**: Role-Based Access Control (RBAC)
 - **Features**: User registration, login, password reset, MFA
+- **Communication**: Pure gRPC for all inter-service communication
 
 #### **3. Organization Management**
-- **Framework**: Axum with domain-driven design
+- **Framework**: Tonic gRPC service with domain-driven design
 - **Purpose**: Manage healthcare providers, clinics, hospitals
 - **Features**: CRUD operations, verification workflows, staff management
+- **Communication**: gRPC APIs for all service interactions
 
 #### **4. Appointment Management**
-- **Framework**: Axum with event sourcing
+- **Framework**: Tonic gRPC service with event sourcing
 - **Purpose**: Handle scheduling and booking
 - **Features**: Availability management, booking workflows, notifications
+- **Communication**: gRPC for real-time appointment updates
 
 #### **5. Payment Service**
-- **Framework**: Axum with financial transaction patterns
+- **Framework**: Tonic gRPC service with financial transaction patterns
 - **Purpose**: Process payments and billing
-- **Integrations**: Razorpay, Stripe, UPI gateways
+- **Integrations**: Razorpay, Stripe, UPI gateways (via HTTP clients within gRPC service)
+- **Communication**: Secure gRPC for payment processing
 
 #### **6. Notification Service**
-- **Framework**: Axum with pub/sub patterns
+- **Framework**: Tonic gRPC service with pub/sub patterns
 - **Purpose**: Handle real-time notifications
-- **Features**: Push notifications, email, SMS, WebSocket connections
+- **Features**: Push notifications, email, SMS coordination
+- **Communication**: gRPC streaming for real-time notification delivery
 
 ---
 
@@ -157,9 +163,10 @@ The health tech platform follows a **microservices architecture** with modular f
 - **HTTP/2**: For transport layer efficiency
 
 ### **Client-Server Communication**
-- **REST APIs**: For web and mobile client communication
-- **WebSocket**: For real-time features (chat, notifications)
-- **GraphQL**: Optional for complex data fetching requirements
+- **REST APIs**: BFF service exposes REST APIs to frontend clients
+- **gRPC-Web**: Direct gRPC communication for advanced web clients
+- **WebSocket**: For real-time features (chat, notifications) exposed by BFF
+- **GraphQL**: Optional for complex data fetching requirements via BFF
 
 ### **Message Queue**
 - **Redis Pub/Sub**: For simple event broadcasting
@@ -206,10 +213,12 @@ The health tech platform follows a **microservices architecture** with modular f
 - **Testing**: Unit tests, integration tests, and end-to-end tests
 
 ### **Monitoring & Observability**
-- **Prometheus**: Metrics collection and alerting
+- **Prometheus**: Metrics collection and alerting (gRPC interceptors + metrics endpoint)
 - **Grafana**: Metrics visualization and dashboards
-- **Jaeger**: Distributed tracing for debugging
-- **Structured Logging**: JSON-based logging with correlation IDs
+- **Jaeger**: Distributed tracing for gRPC services
+- **OpenTelemetry**: Rust tracing instrumentation for gRPC
+- **Structured Logging**: JSON-based logging with correlation IDs via `tracing` crate
+- **Health Checks**: gRPC health checking protocol or minimal HTTP sidecar
 
 ---
 

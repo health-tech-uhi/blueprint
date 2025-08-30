@@ -18,19 +18,11 @@
 
 ### 1. Microservices Architecture with Rust
 ```rust
-// Main server structure using Axum
-use axum::{
-    routing::{get, post},
-    Router,
-    middleware::from_fn,
-    extract::State,
-};
+// Main gRPC server structure using Tonic
+use tonic::{transport::Server, Request, Response, Status};
+use tonic_reflection::server::Builder as ReflectionBuilder;
 use tower::ServiceBuilder;
-use tower_http::{
-    cors::CorsLayer,
-    trace::TraceLayer,
-    compression::CompressionLayer,
-};
+use tower_http::trace::TraceLayer;
 
 #[derive(Clone)]
 pub struct AppState {
@@ -39,19 +31,31 @@ pub struct AppState {
     config: Arc<Config>,
 }
 
-pub fn create_app(state: AppState) -> Router {
-    Router::new()
-        .route("/health", get(health_check))
-        .route("/api/v1/appointments", get(get_appointments).post(create_appointment))
-        .route("/api/v1/patients", get(get_patients).post(create_patient))
+pub async fn create_grpc_server(state: AppState) -> Result<(), Box<dyn std::error::Error>> {
+    let addr = "0.0.0.0:50051".parse()?;
+    
+    let patient_service = PatientServiceImpl::new(state.clone());
+    let appointment_service = AppointmentServiceImpl::new(state.clone());
+    let payment_service = PaymentServiceImpl::new(state);
+    
+    let reflection_service = ReflectionBuilder::configure()
+        .register_encoded_file_descriptor_set(include_bytes!("../proto/descriptor.bin"))
+        .build()?;
+    
+    Server::builder()
         .layer(
             ServiceBuilder::new()
-                .layer(TraceLayer::new_for_http())
-                .layer(CompressionLayer::new())
-                .layer(CorsLayer::permissive())
-                .layer(from_fn(auth_middleware))
+                .layer(TraceLayer::new_for_grpc())
+                .layer(tower::middleware::from_fn(auth_interceptor))
         )
-        .with_state(state)
+        .add_service(reflection_service)
+        .add_service(patient_service_server::PatientServiceServer::new(patient_service))
+        .add_service(appointment_service_server::AppointmentServiceServer::new(appointment_service))
+        .add_service(payment_service_server::PaymentServiceServer::new(payment_service))
+        .serve(addr)
+        .await?;
+    
+    Ok(())
 }
 ```
 
@@ -733,28 +737,24 @@ pub enum Permission {
     AdminAccess,
 }
 
-// JWT middleware
-pub async fn auth_middleware(
-    State(state): State<AppState>,
-    request: Request<Body>,
-    next: Next<Body>,
-) -> Result<Response, StatusCode> {
-    let auth_header = request
-        .headers()
-        .get("Authorization")
-        .and_then(|header| header.to_str().ok())
-        .and_then(|header| header.strip_prefix("Bearer "));
+// gRPC interceptor for authentication
+pub fn auth_interceptor(req: Request<()>) -> Result<Request<()>, Status> {
+    let token = req
+        .metadata()
+        .get("authorization")
+        .and_then(|value| value.to_str().ok())
+        .and_then(|auth| auth.strip_prefix("Bearer "));
     
-    let token = auth_header.ok_or(StatusCode::UNAUTHORIZED)?;
+    let token = token.ok_or_else(|| Status::unauthenticated("Missing authorization token"))?;
     
-    let claims = validate_jwt(token, &state.config.jwt_secret)
-        .map_err(|_| StatusCode::UNAUTHORIZED)?;
+    let claims = validate_jwt(token, &JWT_SECRET)
+        .map_err(|_| Status::unauthenticated("Invalid token"))?;
     
     // Add claims to request extensions
-    let mut request = request;
-    request.extensions_mut().insert(claims);
+    let mut req = req;
+    req.extensions_mut().insert(claims);
     
-    Ok(next.run(request).await?)
+    Ok(req)
 }
 
 // Role-based access control

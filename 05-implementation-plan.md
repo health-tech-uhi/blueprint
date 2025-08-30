@@ -152,7 +152,7 @@ POST /auth/verify-mfa
 
 #### **Week 7-8: Backend-for-Frontend (BFF)**
 **Tasks:**
-- Implement BFF service with Axum framework
+- Implement BFF service with Tonic gRPC framework
 - Set up gRPC communication between services
 - Create API gateway functionality
 - Implement request/response transformation

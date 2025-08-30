@@ -13,7 +13,7 @@ graph TB
 
     %% Backend for Frontend
     subgraph "Backend for Frontend Layer"
-        BFF[BFF Service<br/>Axum + Rust]
+        BFF[BFF Service<br/>Tonic gRPC + Rust]
     end
 
     %% Core Backend Services
