@@ -2,78 +2,73 @@
 
 ## **Project Overview & Timeline**
 
-The health tech platform implementation is structured in **4 major phases** over **12 months**, with each phase building upon the previous one to deliver a fully functional, UHI-compliant healthcare platform.
+The health tech platform implementation is structured in **3 major phases** over **8 months**, targeting **3-5 clinics and 1 hospital initially**. With a lean team of **2 developers** leveraging **AI-powered vibe coding** for accelerated development, this focused approach ensures rapid iteration and early market validation.
+
+### **Initial Target Market**
+- **Primary Focus**: 3-5 partner clinics in urban areas
+- **Secondary Target**: 1 multi-specialty hospital
+- **Geographic Scope**: Single city/region for MVP validation
+- **Expected Users**: ~500 patients, ~50 healthcare providers initially
+
+### **Development Approach**
+- **Team Size**: 2 experienced full-stack developers
+- **AI Assistance**: Extensive use of vibe coding and AI-powered development tools
+- **Methodology**: Agile development with 2-week sprints
+- **Focus**: MVP-first approach with rapid iteration based on user feedback
 
 ### **High-Level Timeline Overview**
 
 ```mermaid
 gantt
-    title Health Tech Platform Implementation Timeline
+    title Health Tech Platform Implementation Timeline (8 Months)
     dateFormat  YYYY-MM
     axisFormat  %b %Y
     
-    section Phase 1: Foundation
-    Infrastructure Setup        :p1-1, 2024-01, 1M
-    Core Backend Services      :p1-2, after p1-1, 1M
-    Frontend Foundation        :p1-3, after p1-2, 1M
+    section Phase 1: MVP Foundation
+    Infrastructure & Auth       :p1-1, 2024-01, 2M
+    Basic Frontend             :p1-2, after p1-1, 1M
     
     section Phase 2: Core Features
-    Organization Management    :p2-1, after p1-3, 1M
-    Appointment System        :p2-2, after p2-1, 1M
-    Payment Integration       :p2-3, after p2-2, 1M
+    Provider & Appointments    :p2-1, after p1-2, 2M
+    Payment Integration       :p2-2, after p2-1, 1M
     
-    section Phase 3: Advanced Features
-    Healthcare Features       :p3-1, after p2-3, 1M
-    Communication System      :p3-2, after p3-1, 1M
-    Analytics & UHI          :p3-3, after p3-2, 1M
-    
-    section Phase 4: Production
-    Performance Optimization  :p4-1, after p3-3, 1M
-    Security & Compliance    :p4-2, after p4-1, 1M
-    Production Launch        :p4-3, after p4-2, 1M
+    section Phase 3: Launch Prep
+    Essential Features        :p3-1, after p2-2, 1M
+    Production Launch         :p3-2, after p3-1, 1M
 ```
 
-### **Phase Dependencies & Flow**
+### **Lean Development Approach**
 
 ```mermaid
 flowchart TD
-    A[Phase 1: Foundation<br/>Months 1-3] --> B[Phase 2: Core Features<br/>Months 4-6]
-    B --> C[Phase 3: Advanced Features<br/>Months 7-9]
-    C --> D[Phase 4: Production & Scale<br/>Months 10-12]
+    A[Phase 1: MVP Foundation<br/>Months 1-3<br/>Core Platform] --> B[Phase 2: Core Features<br/>Months 4-6<br/>Essential Healthcare]
+    B --> C[Phase 3: Launch Ready<br/>Months 7-8<br/>Production & Go-Live]
     
-    A1[Infrastructure Setup] --> A2[Core Backend Services]
-    A2 --> A3[Frontend Foundation]
-    
-    B1[Organization Management] --> B2[Appointment System]
-    B2 --> B3[Payment Integration]
-    
-    C1[Healthcare Features] --> C2[Communication System]
-    C2 --> C3[Analytics & UHI]
-    
-    D1[Performance Optimization] --> D2[Security & Compliance]
-    D2 --> D3[Production Launch]
+    A1[Infrastructure + Auth] --> A2[Basic Web/Mobile UI]
+    B1[Provider Management] --> B2[Appointment System + Payment]
+    C1[Final Features + Testing] --> C2[Production Launch]
     
     A -.-> A1
     A1 -.-> A2
-    A2 -.-> A3
     
     B -.-> B1
     B1 -.-> B2
-    B2 -.-> B3
     
     C -.-> C1
     C1 -.-> C2
-    C2 -.-> C3
-    
-    D -.-> D1
-    D1 -.-> D2
-    D2 -.-> D3
     
     style A fill:#e1f5fe
     style B fill:#f3e5f5
-    style C fill:#fff3e0
-    style D fill:#e8f5e8
+    style C fill:#e8f5e8
 ```
+
+### **AI-Powered Development Strategy**
+
+- **Vibe Coding**: Leverage AI assistants for rapid code generation and debugging
+- **Template Generation**: Use AI to create boilerplate code for CRUD operations
+- **Code Review**: AI-assisted code quality checks and optimization suggestions
+- **Documentation**: Auto-generate API documentation and user guides
+- **Testing**: AI-powered test case generation and automated testing
 
 ---
 
@@ -342,460 +337,310 @@ POST /providers/{id}/slots
 
 ---
 
-## **Phase 3: Advanced Features (Months 7-9)**
+## **Phase 3: Launch Preparation (Months 7-8)**
 
 ### **Objectives**
-- Implement advanced healthcare features
-- Enable real-time communication capabilities
-- Add analytics and reporting
-- Integrate with UHI network
+- Implement essential features for launch
+- Complete security and compliance requirements
+- Optimize platform performance
+- Execute production deployment
 
-### **Phase 3.1: Healthcare Features (Month 7)**
+### **Phase 3.1: Essential Features & Integration (Month 7)**
 
-#### **Week 25-26: Health Records Management**
+#### **Week 25-26: Core Healthcare Features**
 **Tasks:**
-- Implement electronic health record (EHR) storage
-- Create medical document upload and management
-- Set up health data privacy controls
-- Implement health record sharing mechanisms
+- Implement basic EHR storage and retrieval
+- Add notification system (email, SMS)
+- Set up real-time WebSocket connections
+- Create basic analytics dashboard
 
 **Deliverables:**
-- ✅ EHR storage and retrieval system
-- ✅ Medical document upload with validation
-- ✅ Privacy controls for health data access
-- ✅ Secure health record sharing APIs
+- ✅ Basic EHR system with document upload
+- ✅ Multi-channel notification service
+- ✅ Real-time notifications for appointments
+- ✅ Provider analytics dashboard
 
 **Dependencies:** Core platform functionality
-**Team:** Backend Team + Security Specialist (3 developers)
-**Estimated Effort:** 120 hours
+**Team:** 2 developers (Lead + Dev 2)
+**Estimated Effort:** 160 hours (with AI assistance)
 
-#### **Week 27-28: Teleconsultation System**
-**Tasks:**
-- Integrate WebRTC for video calling
-- Implement session management
-- Create consultation recording and notes
-- Set up consultation scheduling
-
-**Deliverables:**
-- ✅ WebRTC-based video calling system
-- ✅ Consultation session management
-- ✅ Session notes and prescription writing
-- ✅ Consultation scheduling integration
-
-**Dependencies:** Appointment system, health records
-**Team:** Backend + Frontend Teams (4 developers)
-**Estimated Effort:** 160 hours
-
-### **Phase 3.2: Notification & Communication (Month 8)**
-
-#### **Week 29-30: Notification Service**
-**Tasks:**
-- Implement multi-channel notification system
-- Set up real-time WebSocket connections
-- Create notification preferences management
-- Integrate with email and SMS providers
-
-**Deliverables:**
-- ✅ Multi-channel notification service
-- ✅ Real-time WebSocket notifications
-- ✅ User notification preferences
-- ✅ Email and SMS notification delivery
-
-**Dependencies:** Core services, payment integration
-**Team:** Backend Team (2 developers)
-**Estimated Effort:** 100 hours
-
-#### **Week 31-32: Discussion Forum**
-**Tasks:**
-- Implement discussion forum backend
-- Create moderation and community features
-- Build forum UI components
-- Add search and categorization
-
-**Deliverables:**
-- ✅ Discussion forum with threading
-- ✅ Community moderation tools
-- ✅ Forum search and categories
-- ✅ User reputation and voting system
-
-**Dependencies:** Notification service
-**Team:** Backend + Frontend Teams (3 developers)
-**Estimated Effort:** 120 hours
-
-### **Phase 3.3: Analytics & UHI Integration (Month 9)**
-
-#### **Week 33-34: Analytics and Reporting**
-**Tasks:**
-- Implement analytics data collection
-- Create reporting dashboard for providers
-- Set up business intelligence metrics
-- Add performance monitoring
-
-**Deliverables:**
-- ✅ Analytics data pipeline
-- ✅ Provider analytics dashboard
-- ✅ Business metrics and KPI tracking
-- ✅ Performance and usage reports
-
-**Dependencies:** All core features
-**Team:** Backend + Frontend Teams (3 developers)
-**Estimated Effort:** 120 hours
-
-#### **Week 35-36: UHI Compliance & Integration**
+#### **Week 27-28: UHI Integration & Compliance**
 **Tasks:**
 - Implement UHI protocol compliance
-- Integrate with UHI gateway
-- Set up healthcare network connectivity
-- Add ABDM integration support
+- Integrate with payment gateway webhooks
+- Set up basic teleconsultation (optional)
+- Complete data privacy measures
 
 **Deliverables:**
 - ✅ UHI protocol implementation
-- ✅ Healthcare network integration
-- ✅ ABDM service connectivity
-- ✅ Compliance validation and testing
-
-**Dependencies:** Core platform completion
-**Team:** Backend Team + Integration Specialist (3 developers)
-**Estimated Effort:** 140 hours
-
----
-
-## **Phase 4: Production & Scale (Months 10-12)**
-
-### **Objectives**
-- Optimize platform performance and scalability
-- Complete security and compliance certification
-- Launch production environment
-- Implement monitoring and maintenance procedures
-
-### **Phase 4.1: Performance Optimization (Month 10)**
-
-#### **Week 37-38: Backend Optimization**
-**Tasks:**
-- Optimize database queries and indexing
-- Implement advanced caching strategies
-- Fine-tune API response times
-- Set up load testing and performance monitoring
-
-**Deliverables:**
-- ✅ Optimized database performance
-- ✅ Redis caching implementation
-- ✅ API performance improvements
-- ✅ Load testing results and optimizations
-
-**Dependencies:** All features implemented
-**Team:** Backend Team + Performance Engineer (3 developers)
-**Estimated Effort:** 120 hours
-
-#### **Week 39-40: Frontend Performance**
-**Tasks:**
-- Optimize bundle sizes and loading times
-- Implement lazy loading and code splitting
-- Improve mobile app performance
-- Set up frontend monitoring
-
-**Deliverables:**
-- ✅ Optimized web application performance
-- ✅ Mobile app performance improvements
-- ✅ Code splitting and lazy loading
-- ✅ Frontend performance monitoring
-
-**Dependencies:** All frontend features
-**Team:** Frontend + Mobile Teams (3 developers)
-**Estimated Effort:** 100 hours
-
-### **Phase 4.2: Security & Compliance (Month 11)**
-
-#### **Week 41-42: Security Hardening**
-**Tasks:**
-- Conduct comprehensive security audit
-- Implement additional security measures
-- Set up vulnerability scanning
-- Complete penetration testing
-
-**Deliverables:**
-- ✅ Security audit report and fixes
-- ✅ Enhanced security measures
-- ✅ Automated vulnerability scanning
-- ✅ Penetration testing clearance
-
-**Dependencies:** All platform features
-**Team:** Security Team + Backend Team (4 developers)
-**Estimated Effort:** 160 hours
-
-#### **Week 43-44: Compliance Certification**
-**Tasks:**
-- Complete UHI compliance certification
-- Implement healthcare data privacy measures
-- Set up audit logging and compliance monitoring
-- Prepare compliance documentation
-
-**Deliverables:**
-- ✅ UHI compliance certification
+- ✅ Payment gateway full integration
+- ✅ Basic video calling (WebRTC)
 - ✅ Healthcare data privacy compliance
-- ✅ Audit logging system
-- ✅ Compliance documentation package
 
-**Dependencies:** Security hardening
-**Team:** Compliance Team + Backend Team (3 developers)
-**Estimated Effort:** 120 hours
+**Dependencies:** Appointment system, payment integration
+**Team:** 2 developers + External compliance consultant
+**Estimated Effort:** 180 hours
 
-### **Phase 4.3: Production Launch (Month 12)**
+### **Phase 3.2: Security, Testing & Launch (Month 8)**
 
-#### **Week 45-46: Production Deployment**
+#### **Week 29-30: Security & Performance**
 **Tasks:**
-- Set up production infrastructure
-- Deploy all services to production
-- Configure monitoring and alerting
-- Conduct final end-to-end testing
+- Conduct security audit and fixes
+- Implement performance optimizations
+- Set up comprehensive monitoring
+- Complete end-to-end testing
 
 **Deliverables:**
-- ✅ Production environment setup
-- ✅ All services deployed and running
-- ✅ Comprehensive monitoring and alerting
-- ✅ Production readiness validation
+- ✅ Security audit completion and fixes
+- ✅ Performance optimizations (caching, queries)
+- ✅ Production monitoring and alerting
+- ✅ Comprehensive testing suite
 
-**Dependencies:** Security and compliance clearance
-**Team:** DevOps + Full Team (6 developers)
-**Estimated Effort:** 200 hours
-
-#### **Week 47-48: Launch & Monitoring**
-**Tasks:**
-- Execute go-live plan
-- Monitor system performance and stability
-- Provide user support and documentation
-- Plan post-launch improvements
-
-**Deliverables:**
-- ✅ Successful production launch
-- ✅ System stability confirmation
-- ✅ User documentation and support
-- ✅ Post-launch improvement roadmap
-
-**Dependencies:** Production deployment
-**Team:** Full Team + Support (8 people)
+**Dependencies:** All core features
+**Team:** 2 developers + External security auditor
 **Estimated Effort:** 160 hours
+
+#### **Week 31-32: Production Launch**
+**Tasks:**
+- Deploy to production environment
+- Configure CDN and SSL certificates
+- Execute go-live plan with partner clinics
+- Monitor system stability and performance
+
+**Deliverables:**
+- ✅ Production deployment successful
+- ✅ CDN and security configurations
+- ✅ Partner clinic onboarding complete
+- ✅ System monitoring and support ready
+
+**Dependencies:** Security clearance, testing completion
+**Team:** 2 developers + External DevOps support
+**Estimated Effort:** 120 hours
 
 ---
 
-## **Resource Allocation & Team Structure**
+## **Lean Team Structure & Resource Allocation**
 
 ### **Core Team Composition**
 
 ```mermaid
-pie title Team Composition (Total: 13 members)
-    "Backend Developers" : 3
-    "Frontend Developers" : 2
-    "Mobile Developers" : 2
-    "QA Engineers" : 2
-    "Tech Lead" : 1
-    "DevOps Engineer" : 1
-    "Security Specialist" : 1
-    "Product Manager" : 1
+pie title Lean Team Composition (Total: 2 developers + support)
+    "Full-Stack Developer 1 (50%)" : 50
+    "Full-Stack Developer 2 (50%)" : 50
 ```
 
 #### **Team Structure & Roles**
 
 ```mermaid
 graph TB
-    TL[Tech Lead<br/>Full-time across all phases]
-    PM[Product Manager<br/>Requirements & coordination]
+    LEAD[Lead Developer<br/>Full-Stack + Architecture]
+    DEV2[Developer 2<br/>Full-Stack + Frontend Focus]
     
-    TL --> BE[Backend Team<br/>3 Developers]
-    TL --> FE[Frontend Team<br/>2 Developers]
-    TL --> ME[Mobile Team<br/>2 Developers]
-    TL --> QA[QA Team<br/>2 Engineers]
-    TL --> DO[DevOps<br/>1 Engineer]
-    TL --> SE[Security<br/>1 Specialist]
+    LEAD --> BACKEND[Backend Services<br/>Rust/gRPC + Supabase]
+    LEAD --> INFRA[Infrastructure<br/>Docker + CI/CD]
+    LEAD --> ARCH[Architecture<br/>System Design]
     
-    BE --> BE1[Rust/gRPC Expert]
-    BE --> BE2[Database Specialist]
-    BE --> BE3[API Developer]
+    DEV2 --> FRONTEND[Frontend<br/>React + TypeScript]
+    DEV2 --> MOBILE[Mobile<br/>React Native/PWA]
+    DEV2 --> UI[UI/UX<br/>Tailwind CSS]
     
-    FE --> FE1[React/TypeScript Expert]
-    FE --> FE2[UI/UX Developer]
+    LEAD -.->|AI Assistance| AI1[Vibe Coding<br/>Code Generation]
+    DEV2 -.->|AI Assistance| AI2[Vibe Coding<br/>Testing & Docs]
     
-    ME --> ME1[iOS Swift Developer]
-    ME --> ME2[Android Kotlin Developer]
+    EXTERNAL[External Support<br/>As Needed]
+    EXTERNAL --> SEC[Security Audit<br/>Contract]
+    EXTERNAL --> QA[QA Testing<br/>Contract]
+    EXTERNAL --> DEPLOY[Deployment<br/>Cloud Services]
     
-    QA --> QA1[Test Automation]
-    QA --> QA2[Manual Testing]
+    style LEAD fill:#ff9999
+    style DEV2 fill:#99ccff
+    style AI1 fill:#99ff99
+    style AI2 fill:#99ff99
+    style EXTERNAL fill:#ffcc99
+```
+
+### **AI-Powered Development Efficiency**
+
+```mermaid
+flowchart TD
+    A[Traditional Development<br/>6-8 developers, 12 months] --> B[AI-Assisted Development<br/>2 developers, 8 months]
     
-    PM -.-> TL
-    PM -.-> BE
-    PM -.-> FE
-    PM -.-> ME
+    B --> C[3x Faster Code Generation]
+    B --> D[2x Faster Testing]
+    B --> E[4x Faster Documentation]
     
-    style TL fill:#ff9999
-    style PM fill:#99ccff
-    style BE fill:#99ff99
-    style FE fill:#ffcc99
-    style ME fill:#cc99ff
-    style QA fill:#ffff99
-    style DO fill:#ff99cc
-    style SE fill:#99ffcc
+    C --> F[60% Time Saved on CRUD Operations]
+    D --> G[70% Time Saved on Unit Tests]
+    E --> H[80% Time Saved on API Documentation]
+    
+    style A fill:#ff6b6b
+    style B fill:#6bcf7f
+    style C fill:#87ceeb
+    style D fill:#87ceeb
+    style E fill:#87ceeb
 ```
 
 ### **Phase-wise Resource Allocation**
 
 ```mermaid
 gantt
-    title Resource Allocation Across Phases
+    title Lean Team Resource Allocation (8 Months)
     dateFormat  X
-    axisFormat  %s
+    axisFormat  Month %s
     
-    section Phase 1: Foundation
-    Backend Team (3)     :p1-be, 0, 3
-    Frontend Team (2)    :p1-fe, 0, 3
-    DevOps (1)          :p1-do, 0, 3
-    Total: 6 people     :milestone, p1-total, 3, 0
+    section Phase 1: Foundation (3M)
+    Lead Dev (Infrastructure)  :p1-lead, 0, 3
+    Dev 2 (Frontend Setup)     :p1-dev2, 0, 3
+    Total: 2 developers       :milestone, p1-total, 3, 0
     
-    section Phase 2: Core Features
-    Backend Team (3)     :p2-be, 3, 6
-    Frontend Team (2)    :p2-fe, 3, 6
-    Mobile Team (2)      :p2-me, 3, 6
-    Security (1)         :p2-se, 3, 6
-    Total: 8 people     :milestone, p2-total, 6, 0
+    section Phase 2: Core Features (3M)
+    Lead Dev (Backend APIs)    :p2-lead, 3, 6
+    Dev 2 (UI/UX + Mobile)    :p2-dev2, 3, 6
+    Total: 2 developers       :milestone, p2-total, 6, 0
     
-    section Phase 3: Advanced Features
-    Backend Team (3)     :p3-be, 6, 9
-    Frontend Team (2)    :p3-fe, 6, 9
-    Mobile Team (2)      :p3-me, 6, 9
-    QA Team (2)         :p3-qa, 6, 9
-    Total: 9 people     :milestone, p3-total, 9, 0
-    
-    section Phase 4: Production
-    Full Team (10)       :p4-all, 9, 12
-    Security Expert      :p4-se, 9, 12
-    Compliance Expert    :p4-ce, 9, 12
-    Total: 10+ people   :milestone, p4-total, 12, 0
+    section Phase 3: Launch (2M)
+    Lead Dev (Integration)     :p3-lead, 6, 8
+    Dev 2 (Polish + Testing)  :p3-dev2, 6, 8
+    External QA Support        :p3-qa, 6, 8
+    Total: 2 devs + support   :milestone, p3-total, 8, 0
 ```
 
-#### **Detailed Phase Allocation**
+### **Skill Distribution**
+
+| Phase | Lead Developer Focus | Developer 2 Focus | AI Assistance |
+|-------|---------------------|-------------------|---------------|
+| **Phase 1** | Infrastructure, Auth, Database | React Setup, Basic UI, PWA | Code scaffolding, boilerplate |
+| **Phase 2** | Backend APIs, gRPC, Payments | Frontend components, Mobile UI | CRUD generation, API clients |
+| **Phase 3** | Integration, Security, Deploy | Testing, Polish, Documentation | Test generation, docs |
+
+### **Budget Estimation (Indian Rupees)**
+
+#### **Total Project Budget: ₹18,50,000**
 
 ```mermaid
-graph LR
-    subgraph "Phase 1: Foundation"
-        P1[6 Team Members]
-        P1 --> P1BE[Backend: 3]
-        P1 --> P1FE[Frontend: 2]
-        P1 --> P1DO[DevOps: 1]
-        P1BE -.-> P1F[Infrastructure & Auth]
-        P1FE -.-> P1F
-        P1DO -.-> P1F
-    end
-    
-    subgraph "Phase 2: Core Features"
-        P2[8 Team Members]
-        P2 --> P2BE[Backend: 3]
-        P2 --> P2FE[Frontend: 2]
-        P2 --> P2ME[Mobile: 2]
-        P2 --> P2SE[Security: 1]
-        P2BE -.-> P2F[Healthcare & Payments]
-        P2FE -.-> P2F
-        P2ME -.-> P2F
-        P2SE -.-> P2F
-    end
-    
-    subgraph "Phase 3: Advanced Features"
-        P3[9 Team Members]
-        P3 --> P3BE[Backend: 3]
-        P3 --> P3FE[Frontend: 2]
-        P3 --> P3ME[Mobile: 2]
-        P3 --> P3QA[QA: 2]
-        P3BE -.-> P3F[Advanced Features]
-        P3FE -.-> P3F
-        P3ME -.-> P3F
-        P3QA -.-> P3F
-    end
-    
-    subgraph "Phase 4: Production"
-        P4[10+ Team Members]
-        P4 --> P4FULL[Full Team: 10]
-        P4 --> P4EXP[+ Specialists]
-        P4FULL -.-> P4F[Launch & Scale]
-        P4EXP -.-> P4F
-    end
-    
-    P1F --> P2F
-    P2F --> P3F
-    P3F --> P4F
-    
-    style P1 fill:#e1f5fe
-    style P2 fill:#f3e5f5
-    style P3 fill:#fff3e0
-    style P4 fill:#e8f5e8
-```
-
-### **Budget Estimation (USD)**
-
-#### **Total Budget Distribution**
-
-```mermaid
-pie title Total Project Budget: $327,500
-    "Development Team (75.6%)" : 247500
-    "Security & Compliance (11.5%)" : 37500
-    "Infrastructure (6.9%)" : 22500
-    "Third-party Services (6.1%)" : 20000
+pie title Lean Team Budget Distribution: ₹18,50,000
+    "Development Team (64.9%)" : 1200000
+    "Infrastructure & Cloud (16.2%)" : 300000
+    "External Services (10.8%)" : 200000
+    "Security & Compliance (8.1%)" : 150000
 ```
 
 #### **Phase-wise Budget Breakdown**
 
 ```mermaid
 gantt
-    title Budget Allocation by Phase (USD)
+    title Budget Allocation by Phase (INR)
     dateFormat  X
-    axisFormat  %s
+    axisFormat  Month %s
     
-    section Phase 1: $55K
-    Budget Allocation    :55, 0, 1
+    section Phase 1 (3M): ₹5.5L
+    Foundation Budget    :5.5, 0, 3
     
-    section Phase 2: $76K
-    Budget Allocation    :76, 1, 2
+    section Phase 2 (3M): ₹7.5L
+    Core Features Budget :7.5, 3, 6
     
-    section Phase 3: $89.5K
-    Budget Allocation    :89, 2, 3
-    
-    section Phase 4: $107K
-    Budget Allocation    :107, 3, 4
+    section Phase 3 (2M): ₹5.5L
+    Launch Budget        :5.5, 6, 8
 ```
 
-#### **Budget Category Analysis**
+#### **Monthly Developer Costs**
+
+| Role | Monthly Rate (INR) | Phase 1 (3M) | Phase 2 (3M) | Phase 3 (2M) | Total (8M) |
+|------|-------------------|---------------|---------------|---------------|------------|
+| **Lead Developer** | ₹80,000 | ₹2,40,000 | ₹2,40,000 | ₹1,60,000 | ₹6,40,000 |
+| **Developer 2** | ₹70,000 | ₹2,10,000 | ₹2,10,000 | ₹1,40,000 | ₹5,60,000 |
+| **Subtotal** | - | ₹4,50,000 | ₹4,50,000 | ₹3,00,000 | ₹12,00,000 |
+
+#### **Infrastructure & Services Costs**
+
+| Service | Monthly Cost | Phase 1 (3M) | Phase 2 (3M) | Phase 3 (2M) | Total (8M) |
+|---------|-------------|---------------|---------------|---------------|------------|
+| **Supabase Pro** | ₹2,500 | ₹7,500 | ₹7,500 | ₹5,000 | ₹20,000 |
+| **Cloudflare Pro** | ₹1,500 | ₹4,500 | ₹4,500 | ₹3,000 | ₹12,000 |
+| **Digital Ocean** | ₹8,000 | ₹24,000 | ₹24,000 | ₹16,000 | ₹64,000 |
+| **Razorpay Gateway** | ₹2,000 | - | ₹6,000 | ₹4,000 | ₹10,000 |
+| **SMS/Email Services** | ₹3,000 | ₹3,000 | ₹9,000 | ₹6,000 | ₹18,000 |
+| **Monitoring Tools** | ₹5,000 | ₹5,000 | ₹15,000 | ₹10,000 | ₹30,000 |
+| **SSL Certificates** | ₹500 | ₹1,500 | ₹1,500 | ₹1,000 | ₹4,000 |
+| **Backup Storage** | ₹2,000 | ₹2,000 | ₹6,000 | ₹4,000 | ₹12,000 |
+| **Domain & DNS** | ₹1,000 | ₹1,000 | ₹3,000 | ₹2,000 | ₹6,000 |
+| **Subtotal** | - | ₹48,500 | ₹76,500 | ₹51,000 | ₹1,76,000 |
+
+#### **External Services Budget**
+
+| Service Type | Phase 1 | Phase 2 | Phase 3 | Total |
+|-------------|---------|---------|---------|-------|
+| **Security Audit** | - | - | ₹80,000 | ₹80,000 |
+| **Legal/Compliance** | ₹20,000 | ₹30,000 | ₹50,000 | ₹1,00,000 |
+| **QA Testing** | - | ₹10,000 | ₹10,000 | ₹20,000 |
+| **Subtotal** | ₹20,000 | ₹40,000 | ₹1,40,000 | ₹2,00,000 |
+
+#### **AI Tools & Productivity Costs**
+
+| Tool | Monthly Cost | 8 Months Total | Purpose |
+|------|-------------|----------------|---------|
+| **GitHub Copilot Business** | ₹1,500 × 2 devs | ₹24,000 | AI code completion |
+| **Claude Pro** | ₹1,500 × 2 devs | ₹24,000 | Advanced AI assistance |
+| **Cursor IDE Pro** | ₹1,500 × 2 devs | ₹24,000 | AI-powered IDE |
+| **Subtotal** | ₹4,500/month | ₹72,000 | Enhanced productivity |
+
+#### **Detailed Budget Summary**
 
 ```mermaid
 gantt
-    title Budget Timeline and Distribution ($327,500 Total)
-    dateFormat  YYYY-MM
-    axisFormat  %b
+    title Project Budget Timeline (₹18,50,000 Total)
+    dateFormat  X
+    axisFormat  Month %s
     
-    section Development Team ($247.5K)
-    Phase 1: $45K        :dev1, 2024-01, 3M
-    Phase 2: $60K        :dev2, after dev1, 3M
-    Phase 3: $67.5K      :dev3, after dev2, 3M
-    Phase 4: $75K        :dev4, after dev3, 3M
+    section Development (₹12L)
+    Phase 1: ₹4.5L      :dev1, 0, 3
+    Phase 2: ₹4.5L      :dev2, 3, 6
+    Phase 3: ₹3L        :dev3, 6, 8
     
-    section Infrastructure ($22.5K)
-    Phase 1: $3K         :inf1, 2024-01, 3M
-    Phase 2: $4.5K       :inf2, after inf1, 3M
-    Phase 3: $6K         :inf3, after inf2, 3M
-    Phase 4: $9K         :inf4, after inf3, 3M
+    section Infrastructure (₹3L)
+    Phase 1: ₹0.5L      :inf1, 0, 3
+    Phase 2: ₹1L        :inf2, 3, 6
+    Phase 3: ₹0.5L      :inf3, 6, 8
     
-    section Security & Compliance ($37.5K)
-    Phase 1: $5K         :sec1, 2024-01, 3M
-    Phase 2: $7.5K       :sec2, after sec1, 3M
-    Phase 3: $10K        :sec3, after sec2, 3M
-    Phase 4: $15K        :sec4, after sec3, 3M
+    section External Services (₹2L)
+    Phase 1: ₹0.2L      :ext1, 0, 3
+    Phase 2: ₹0.4L      :ext2, 3, 6
+    Phase 3: ₹1.4L      :ext3, 6, 8
+    
+    section AI Tools (₹1.5L)
+    Continuous Cost     :ai, 0, 8
 ```
 
-#### **Detailed Budget Table**
+#### **Final Budget Breakdown**
 
-| Category | Phase 1 | Phase 2 | Phase 3 | Phase 4 | Total |
-|----------|---------|---------|---------|---------|-------|
-| Development Team | $45,000 | $60,000 | $67,500 | $75,000 | $247,500 |
-| Infrastructure | $3,000 | $4,500 | $6,000 | $9,000 | $22,500 |
-| Third-party Services | $2,000 | $4,000 | $6,000 | $8,000 | $20,000 |
-| Security & Compliance | $5,000 | $7,500 | $10,000 | $15,000 | $37,500 |
-| **Total per Phase** | **$55,000** | **$76,000** | **$89,500** | **$107,000** | **$327,500** |
+| Category | Phase 1 (3M) | Phase 2 (3M) | Phase 3 (2M) | **Total (8M)** |
+|----------|---------------|---------------|---------------|----------------|
+| **Development Team** | ₹4,50,000 | ₹4,50,000 | ₹3,00,000 | **₹12,00,000** |
+| **Infrastructure** | ₹48,500 | ₹76,500 | ₹51,000 | **₹1,76,000** |
+| **External Services** | ₹20,000 | ₹40,000 | ₹1,40,000 | **₹2,00,000** |
+| **AI Tools** | ₹13,500 | ₹13,500 | ₹9,000 | **₹36,000** |
+| **Contingency (10%)** | ₹53,200 | ₹58,000 | ₹50,000 | **₹1,61,200** |
+| **Total per Phase** | **₹5,85,200** | **₹6,38,000** | **₹5,50,000** | **₹17,73,200** |
+| **Rounded Total** | **₹6,00,000** | **₹6,50,000** | **₹6,00,000** | **₹18,50,000** |
+
+### **Cost Optimization Strategies**
+
+#### **AI-Powered Efficiency Gains**
+- **50% reduction** in development time through vibe coding
+- **70% reduction** in testing effort with AI-generated tests  
+- **60% reduction** in documentation time with auto-generation
+- **Overall cost savings**: ~₹8-10 lakhs compared to traditional development
+
+#### **Infrastructure Optimization**
+- Start with basic tier services, scale up as needed
+- Use serverless functions for sporadic workloads
+- Leverage free tiers and startup credits where available
+- Monitor and optimize resource usage monthly
+
+#### **Payment Schedule**
+- **Phase 1**: ₹6,00,000 (Infrastructure + Foundation)
+- **Phase 2**: ₹6,50,000 (Core Features + Integrations)  
+- **Phase 3**: ₹6,00,000 (Launch + Security + Compliance)
 
 ---
 

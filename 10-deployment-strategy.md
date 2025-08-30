@@ -398,13 +398,64 @@ spec:
 
 #### **Build Process**
 ```bash
-# Build optimized production bundle
+# Install dependencies including Tailwind CSS
+npm install
+
+# Build optimized production bundle with Tailwind CSS
 npm run build
 
 # Output: Static assets in build/ directory
-# - HTML, CSS, JavaScript files
+# - HTML, CSS, JavaScript files with compiled Tailwind CSS
 # - Images, fonts, and other assets
 # - Service worker for PWA features
+# - Optimized and purged CSS bundle
+```
+
+#### **Tailwind CSS Configuration**
+```javascript
+// tailwind.config.js
+module.exports = {
+  content: [
+    "./src/**/*.{js,jsx,ts,tsx}",
+    "./public/index.html"
+  ],
+  theme: {
+    extend: {
+      colors: {
+        primary: {
+          50: '#f0f9ff',
+          100: '#e0f2fe',
+          500: '#0ea5e9',
+          600: '#0284c7',
+          900: '#0c4a6e',
+        },
+        healthcare: {
+          hospital: '#2563eb',
+          pharmacy: '#059669',
+          lab: '#dc2626',
+          emergency: '#dc2626',
+        },
+      },
+      fontFamily: {
+        sans: ['Inter', 'system-ui', 'sans-serif'],
+      },
+    },
+  },
+  plugins: [
+    require('@tailwindcss/forms'),
+    require('@tailwindcss/typography'),
+    require('@tailwindcss/aspect-ratio'),
+  ],
+}
+
+// postcss.config.js
+module.exports = {
+  plugins: {
+    tailwindcss: {},
+    autoprefixer: {},
+    ...(process.env.NODE_ENV === 'production' ? { cssnano: {} } : {})
+  }
+}
 ```
 
 #### **CDN Deployment Options**
