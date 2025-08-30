@@ -485,24 +485,21 @@ flowchart TD
 ```mermaid
 gantt
     title Lean Team Resource Allocation (8 Months)
-    dateFormat  X
-    axisFormat  Month %s
+    dateFormat  YYYY-MM-DD
+    axisFormat  %b
     
-    section Phase 1: Foundation (3M)
-    Lead Dev (Infrastructure)  :p1-lead, 0, 3
-    Dev 2 (Frontend Setup)     :p1-dev2, 0, 3
-    Total: 2 developers       :milestone, p1-total, 3, 0
+    section Phase 1 Foundation
+    Lead Dev Infrastructure    :p1-lead, 2024-01-01, 3M
+    Dev 2 Frontend Setup      :p1-dev2, 2024-01-01, 3M
     
-    section Phase 2: Core Features (3M)
-    Lead Dev (Backend APIs)    :p2-lead, 3, 6
-    Dev 2 (UI/UX + Mobile)    :p2-dev2, 3, 6
-    Total: 2 developers       :milestone, p2-total, 6, 0
+    section Phase 2 Core Features
+    Lead Dev Backend APIs     :p2-lead, 2024-04-01, 3M
+    Dev 2 UI UX Mobile       :p2-dev2, 2024-04-01, 3M
     
-    section Phase 3: Launch (2M)
-    Lead Dev (Integration)     :p3-lead, 6, 8
-    Dev 2 (Polish + Testing)  :p3-dev2, 6, 8
-    External QA Support        :p3-qa, 6, 8
-    Total: 2 devs + support   :milestone, p3-total, 8, 0
+    section Phase 3 Launch
+    Lead Dev Integration      :p3-lead, 2024-07-01, 2M
+    Dev 2 Polish Testing     :p3-dev2, 2024-07-01, 2M
+    External QA Support       :p3-qa, 2024-07-01, 2M
 ```
 
 ### **Skill Distribution**
