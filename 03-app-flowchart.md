@@ -1,6 +1,6 @@
-# **App Flowchart**
+# **ABDM-Compliant Healthcare Platform - Application Flowcharts**
 
-## **High-Level System Architecture**
+## **High-Level ABDM Ecosystem Architecture**
 
 ```mermaid
 graph TB
@@ -9,248 +9,620 @@ graph TB
         WEB[Desktop Web Client<br/>React + TypeScript]
         IOS[iOS Client<br/>Swift + SwiftUI]
         AND[Android Client<br/>Kotlin + Jetpack Compose]
+        PWA[Progressive Web App<br/>Offline Capable]
     end
 
     %% Backend for Frontend
     subgraph "Backend for Frontend Layer"
         BFF[BFF Service<br/>Tonic gRPC + Rust]
+        API_GW[API Gateway<br/>Rate Limiting + Authentication]
     end
 
-    %% Core Backend Services
-    subgraph "Core Backend Services"
-        IAM[Identity & Access Management<br/>Rust + JWT]
-        ORG[Organization Management<br/>Rust + Domain Logic]
-        APT[Appointment Management<br/>Rust + Event Sourcing]
-        PAY[Payment Service<br/>Rust + Financial Patterns]
-        NOT[Notification Service<br/>Rust + Pub/Sub]
-        DISC[Discussion Forum<br/>Rust + Real-time]
-        SUB[Subscription Service<br/>Rust + Billing Logic]
+    %% ABDM Core Services
+    subgraph "ABDM Compliance Layer"
+        ABHA[ABHA Service<br/>Health ID Management]
+        UHI_GW[UHI Gateway<br/>Healthcare Protocol]
+        EHR[EHR Service<br/>FHIR R4 Compliant]
+        CONSENT[Consent Manager<br/>Granular Permissions]
+        ANALYTICS[Analytics Service<br/>GraphQL + Healthcare Insights]
     end
 
-    %% Data Layer
+    %% Core Healthcare Services
+    subgraph "Healthcare Management Services"
+        IAM[Identity & Access Management<br/>Multi-factor + Biometric]
+        ORG[Organization Management<br/>HFR Integration]
+        HPR[Healthcare Professional Registry<br/>Credential Verification]
+        APT[Appointment Management<br/>UHI Compliant Booking]
+        TELE[Teleconsultation Service<br/>Video + Session Management]
+        CHRONIC[Chronic Care Management<br/>Disease Monitoring]
+    end
+
+    %% Clinical & Operational Services
+    subgraph "Clinical Services"
+        CDX[Clinical Decision Support<br/>AI-Powered Diagnostics]
+        PHARM[Telepharmacy Service<br/>Medication Management]
+        LAB[Laboratory Integration<br/>Diagnostic Reports]
+        IMAGING[Medical Imaging<br/>DICOM + FHIR]
+        EMERGENCY[Emergency Services<br/>Critical Care Coordination]
+    end
+
+    %% Financial & Administrative Services
+    subgraph "Financial & Administrative"
+        NHCX[NHCX Integration<br/>Claims Processing]
+        PAY[Payment Service<br/>Multi-gateway Integration]
+        INS[Insurance Management<br/>Coverage Verification]
+        BILLING[Billing & Invoicing<br/>Automated Processing]
+        NOT[Notification Service<br/>Multi-channel Alerts]
+    end
+
+    %% Data & Storage Layer
     subgraph "Data & Storage Layer"
-        SUPA[(Supabase<br/>PostgreSQL + RLS)]
-        REDIS[(Redis<br/>Caching + Sessions)]
-        STORAGE[Supabase Storage<br/>File Management]
+        SUPA[(Supabase PostgreSQL<br/>RLS + Encryption)]
+        REDIS[(Redis Cluster<br/>Session + Cache)]
+        FHIR_STORE[(FHIR Data Store<br/>Clinical Documents)]
+        AUDIT_LOG[(Audit Logs<br/>Compliance Tracking)]
+        FILE_STORE[Encrypted File Storage<br/>Medical Documents]
     end
 
-    %% External Services
-    subgraph "External Integrations"
-        UHI[UHI Gateway<br/>Healthcare Network]
-        PAYMENT[Payment Gateways<br/>Razorpay, Stripe, UPI]
-        SMS[SMS/Email<br/>Notification Providers]
-        ABDM[ABDM Services<br/>National Health Registry]
+    %% ABDM External Integrations
+    subgraph "ABDM Ecosystem"
+        ABDM_HIP[Health Information Provider]
+        ABDM_HIU[Health Information User]
+        ABDM_HRP[Health Repository Provider]
+        ABDM_PHR[Personal Health Records]
+        GOVT_REG[Government Registries<br/>HFR + HPR + ABHA]
     end
 
-    %% Connections
-    WEB --> BFF
-    IOS --> BFF
-    AND --> BFF
+    %% External Healthcare Network
+    subgraph "Healthcare Network"
+        UHI_NET[UHI Network Participants]
+        HOSPITAL[Hospital Systems<br/>EMR Integration]
+        PHARMACY[Pharmacy Networks]
+        DIAGNOSTIC[Diagnostic Centers]
+        INSURANCE[Insurance Providers]
+    end
 
+    %% Client Connections
+    WEB --> API_GW
+    IOS --> API_GW
+    AND --> API_GW
+    PWA --> API_GW
+    API_GW --> BFF
+
+    %% BFF to Core Services
+    BFF --> ABHA
+    BFF --> UHI_GW
+    BFF --> EHR
+    BFF --> CONSENT
+    BFF --> ANALYTICS
     BFF --> IAM
     BFF --> ORG
+    BFF --> HPR
     BFF --> APT
-    BFF --> PAY
-    BFF --> NOT
-    BFF --> DISC
-    BFF --> SUB
+    BFF --> TELE
 
+    %% Healthcare Service Connections
+    APT --> CDX
+    APT --> PHARM
+    APT --> LAB
+    APT --> IMAGING
+    TELE --> CDX
+    CHRONIC --> CDX
+    EMERGENCY --> CDX
+
+    %% Financial Service Connections
+    APT --> NHCX
+    APT --> PAY
+    PAY --> INS
+    PAY --> BILLING
+    BILLING --> NHCX
+
+    %% Data Layer Connections
+    ABHA --> SUPA
+    EHR --> FHIR_STORE
+    CONSENT --> SUPA
     IAM --> SUPA
     ORG --> SUPA
+    HPR --> SUPA
     APT --> SUPA
+    TELE --> SUPA
+    CDX --> FHIR_STORE
+    PHARM --> SUPA
+    LAB --> FHIR_STORE
+    IMAGING --> FHIR_STORE
+    EMERGENCY --> SUPA
+    NHCX --> SUPA
     PAY --> SUPA
+    INS --> SUPA
+    BILLING --> SUPA
     NOT --> REDIS
-    DISC --> SUPA
-    SUB --> SUPA
-
     BFF --> REDIS
+    ANALYTICS --> FHIR_STORE
     
-    ORG --> STORAGE
-    APT --> STORAGE
+    %% File Storage
+    EHR --> FILE_STORE
+    LAB --> FILE_STORE
+    IMAGING --> FILE_STORE
     
-    ORG --> UHI
-    APT --> UHI
-    PAY --> PAYMENT
-    NOT --> SMS
-    IAM --> ABDM
+    %% Audit Logging
+    IAM --> AUDIT_LOG
+    EHR --> AUDIT_LOG
+    CONSENT --> AUDIT_LOG
+    NHCX --> AUDIT_LOG
+
+    %% ABDM Ecosystem Integration
+    ABHA --> GOVT_REG
+    HPR --> GOVT_REG
+    ORG --> GOVT_REG
+    EHR --> ABDM_HIP
+    EHR --> ABDM_HIU
+    EHR --> ABDM_HRP
+    CONSENT --> ABDM_PHR
+    UHI_GW --> ABDM_PHR
+
+    %% External Network Integration
+    UHI_GW --> UHI_NET
+    ORG --> HOSPITAL
+    PHARM --> PHARMACY
+    LAB --> DIAGNOSTIC
+    NHCX --> INSURANCE
+    EMERGENCY --> HOSPITAL
 ```
 
 ---
 
-## **User Journey Flowcharts**
+## **ABDM-Compliant User Journey Flowcharts**
 
-### **Patient User Journey**
+### **Patient ABHA Registration & Onboarding Journey**
 
 ```mermaid
 graph TD
-    START([Patient Opens App]) --> AUTH{Already Logged In?}
+    START([New User Opens App]) --> WELCOME[Welcome Screen]
+    WELCOME --> ABHA_OPTION{Has ABHA ID?}
     
-    AUTH -->|No| LOGIN[Login/Register Screen]
-    AUTH -->|Yes| DASHBOARD[Patient Dashboard]
+    ABHA_OPTION -->|No| CREATE_ABHA[Create ABHA Account]
+    ABHA_OPTION -->|Yes| LINK_ABHA[Link Existing ABHA]
     
-    LOGIN --> VERIFY[Verify Credentials]
-    VERIFY --> DASHBOARD
+    CREATE_ABHA --> AADHAAR[Enter Aadhaar Number]
+    AADHAAR --> OTP_VERIFY[OTP Verification]
+    OTP_VERIFY --> DEMO_VERIFY[Demographic Verification]
+    DEMO_VERIFY --> FACE_AUTH[Face Authentication]
+    FACE_AUTH --> ABHA_CREATED[ABHA Account Created]
     
-    DASHBOARD --> SEARCH[Search Healthcare Services]
-    DASHBOARD --> RECORDS[View Health Records]
+    LINK_ABHA --> ABHA_INPUT[Enter ABHA Number]
+    ABHA_INPUT --> MOBILE_OTP[Mobile OTP Verification]
+    MOBILE_OTP --> ABHA_LINKED[ABHA Account Linked]
+    
+    ABHA_CREATED --> CONSENT_SETUP[Setup Consent Preferences]
+    ABHA_LINKED --> CONSENT_SETUP
+    CONSENT_SETUP --> PHR_SETUP[Initialize PHR]
+    PHR_SETUP --> PROFILE_COMPLETE[Complete Health Profile]
+    PROFILE_COMPLETE --> DASHBOARD[Patient Dashboard]
+    
+    DASHBOARD --> DISCOVER[UHI Service Discovery]
+    DASHBOARD --> PHR_ACCESS[Access Health Records]
     DASHBOARD --> APPOINTMENTS[My Appointments]
-    DASHBOARD --> PROFILE[Profile Management]
+    DASHBOARD --> CHRONIC_CARE[Chronic Care Management]
+    DASHBOARD --> EMERGENCY[Emergency Services]
+    DASHBOARD --> INSURANCE[Insurance & Claims]
     
-    SEARCH --> FILTERS[Apply Filters<br/>Location, Specialty, Price]
-    FILTERS --> RESULTS[View Search Results]
-    RESULTS --> SELECT[Select Provider]
+    DISCOVER --> UHI_SEARCH[Search Healthcare Providers]
+    UHI_SEARCH --> FILTERS[Apply Filters<br/>Location, Specialty, Insurance]
+    FILTERS --> PROVIDER_LIST[UHI Provider Results]
+    PROVIDER_LIST --> PROVIDER_DETAILS[View Provider Details]
+    PROVIDER_DETAILS --> BOOK_APPOINTMENT[UHI Compliant Booking]
     
-    SELECT --> BOOK[Book Appointment]
-    BOOK --> PAYMENT[Payment Processing]
-    PAYMENT --> CONFIRM[Appointment Confirmed]
-    CONFIRM --> NOTIFY[Send Notifications]
+    BOOK_APPOINTMENT --> INSURANCE_CHECK[Verify Insurance Coverage]
+    INSURANCE_CHECK --> CONSENT_GRANT[Grant Data Sharing Consent]
+    CONSENT_GRANT --> PAYMENT_FLOW[Payment Processing]
+    PAYMENT_FLOW --> APPOINTMENT_CONFIRMED[Appointment Confirmed]
+    APPOINTMENT_CONFIRMED --> CARE_CONTEXT[Create Care Context]
     
-    APPOINTMENTS --> MANAGE[Manage Existing Appointments]
-    MANAGE --> RESCHEDULE[Reschedule]
-    MANAGE --> CANCEL[Cancel]
-    MANAGE --> JOIN[Join Teleconsultation]
+    PHR_ACCESS --> HEALTH_TIMELINE[View Health Timeline]
+    PHR_ACCESS --> SHARE_RECORDS[Share with Providers]
+    PHR_ACCESS --> DOWNLOAD_RECORDS[Download Records]
+    SHARE_RECORDS --> CONSENT_MANAGEMENT[Manage Data Sharing Consent]
     
-    RECORDS --> VIEW[View Medical Records]
-    RECORDS --> SHARE[Share with Provider]
-    RECORDS --> DOWNLOAD[Download Records]
+    CHRONIC_CARE --> DISEASE_TRACKING[Track Disease Parameters]
+    CHRONIC_CARE --> MEDICATION_MGMT[Medication Management]
+    CHRONIC_CARE --> CARE_PLAN[Follow Care Plans]
+    CHRONIC_CARE --> ALERTS[Health Alerts & Reminders]
     
-    PROFILE --> UPDATE[Update Information]
-    PROFILE --> FAMILY[Manage Family Members]
-    PROFILE --> PREFERENCES[Set Preferences]
+    EMERGENCY --> LOCATE_SERVICES[Find Emergency Services]
+    EMERGENCY --> SHARE_CRITICAL_DATA[Share Critical Health Data]
+    EMERGENCY --> EMERGENCY_CONTACTS[Contact Emergency Contacts]
+    
+    INSURANCE --> POLICY_LINK[Link Insurance Policies]
+    INSURANCE --> COVERAGE_CHECK[Check Coverage Eligibility]
+    INSURANCE --> CLAIM_STATUS[Track Claim Status]
+    INSURANCE --> PREAUTH[Request Preauthorization]
 ```
 
-### **Healthcare Provider User Journey**
+### **Healthcare Provider HPR Registration & Workflow**
 
 ```mermaid
 graph TD
-    START([Provider Opens App]) --> AUTH{Already Logged In?}
+    START([Healthcare Professional Opens App]) --> AUTH{Already Registered?}
     
-    AUTH -->|No| LOGIN[Login Screen]
-    AUTH -->|Yes| DASHBOARD[Provider Dashboard]
+    AUTH -->|No| HPR_REGISTER[HPR Registration]
+    AUTH -->|Yes| LOGIN[Login with HPR ID]
     
-    LOGIN --> VERIFY[Verify Credentials & Role]
-    VERIFY --> DASHBOARD
+    HPR_REGISTER --> PROFESSIONAL_TYPE[Select Professional Type<br/>Doctor/Nurse/Allied Health]
+    PROFESSIONAL_TYPE --> CREDENTIALS[Upload Professional Credentials]
+    CREDENTIALS --> MEDICAL_COUNCIL[Medical Council Verification]
+    MEDICAL_COUNCIL --> FACILITY_LINK[Link to Health Facility]
+    FACILITY_LINK --> HPR_APPROVED[HPR Registration Approved]
     
-    DASHBOARD --> SCHEDULE[Manage Schedule]
-    DASHBOARD --> PATIENTS[Patient Management]
-    DASHBOARD --> ANALYTICS[View Analytics]
-    DASHBOARD --> SETTINGS[Organization Settings]
+    LOGIN --> MFA[Multi-Factor Authentication]
+    HPR_APPROVED --> MFA
+    MFA --> DASHBOARD[Provider Dashboard]
     
-    SCHEDULE --> SLOTS[Set Available Slots]
-    SCHEDULE --> BOOKINGS[View Bookings]
-    SCHEDULE --> TELECONSULT[Teleconsultation Sessions]
+    DASHBOARD --> HFR_MGMT[Health Facility Management]
+    DASHBOARD --> PATIENT_CARE[Patient Care Workflows]
+    DASHBOARD --> CLINICAL_TOOLS[Clinical Decision Support]
+    DASHBOARD --> CLAIMS_MGMT[Claims & Insurance Management]
+    DASHBOARD --> ANALYTICS[Healthcare Analytics]
+    DASHBOARD --> COMPLIANCE[Regulatory Compliance]
     
-    PATIENTS --> RECORDS[Patient Records]
-    PATIENTS --> COMMUNICATION[Patient Communication]
-    PATIENTS --> PRESCRIPTIONS[Manage Prescriptions]
+    HFR_MGMT --> FACILITY_REG[Register/Update Facility]
+    HFR_MGMT --> SERVICE_CATALOG[Manage Service Catalog]
+    HFR_MGMT --> STAFF_MGMT[Staff Management]
+    HFR_MGMT --> CAPACITY_MGMT[Capacity Management]
     
-    BOOKINGS --> APPROVE[Approve Booking]
-    BOOKINGS --> MODIFY[Modify Appointment]
-    BOOKINGS --> CANCEL_PROV[Cancel Appointment]
+    PATIENT_CARE --> APPOINTMENT_MGMT[Appointment Management]
+    PATIENT_CARE --> EHR_ACCESS[Electronic Health Records]
+    PATIENT_CARE --> TELECONSULT[Teleconsultation Platform]
+    PATIENT_CARE --> PRESCRIPTION[Digital Prescriptions]
+    PATIENT_CARE --> CARE_COORDINATION[Care Team Coordination]
     
-    TELECONSULT --> START_CALL[Start Video Call]
-    TELECONSULT --> NOTES[Add Session Notes]
-    TELECONSULT --> PRESCRIBE[Write Prescription]
+    APPOINTMENT_MGMT --> VIEW_BOOKINGS[View UHI Bookings]
+    APPOINTMENT_MGMT --> MANAGE_SLOTS[Manage Available Slots]
+    APPOINTMENT_MGMT --> PATIENT_COMM[Patient Communication]
     
-    ANALYTICS --> REVENUE[Revenue Reports]
-    ANALYTICS --> PATIENT_STATS[Patient Statistics]
-    ANALYTICS --> PERFORMANCE[Performance Metrics]
+    EHR_ACCESS --> FHIR_RECORDS[FHIR R4 Patient Records]
+    EHR_ACCESS --> CONSENT_REQUEST[Request Data Access Consent]
+    EHR_ACCESS --> CLINICAL_DOCS[Clinical Documentation]
+    EHR_ACCESS --> LAB_INTEGRATION[Laboratory Results]
+    
+    TELECONSULT --> VIDEO_SESSION[Start Video Consultation]
+    TELECONSULT --> SESSION_NOTES[Clinical Session Notes]
+    TELECONSULT --> REMOTE_MONITORING[Remote Patient Monitoring]
+    
+    PRESCRIPTION --> DIGITAL_RX[Create Digital Prescription]
+    PRESCRIPTION --> DRUG_INTERACTION[Drug Interaction Checking]
+    PRESCRIPTION --> PHARMACY_INTEGRATION[Send to Pharmacy]
+    
+    CLINICAL_TOOLS --> DIAGNOSIS_SUPPORT[AI Diagnosis Support]
+    CLINICAL_TOOLS --> TREATMENT_GUIDELINES[Evidence-based Guidelines]
+    CLINICAL_TOOLS --> RISK_ASSESSMENT[Patient Risk Assessment]
+    CLINICAL_TOOLS --> OUTCOME_TRACKING[Clinical Outcome Tracking]
+    
+    CLAIMS_MGMT --> NHCX_INTEGRATION[NHCX Claims Processing]
+    CLAIMS_MGMT --> PREAUTH_MGMT[Preauthorization Management]
+    CLAIMS_MGMT --> BILLING_AUTOMATION[Automated Billing]
+    CLAIMS_MGMT --> PAYMENT_RECONCILIATION[Payment Reconciliation]
+    
+    ANALYTICS --> PATIENT_INSIGHTS[Patient Population Insights]
+    ANALYTICS --> PERFORMANCE_METRICS[Clinical Performance Metrics]
+    ANALYTICS --> REVENUE_ANALYTICS[Revenue & Financial Analytics]
+    ANALYTICS --> QUALITY_INDICATORS[Quality Improvement Indicators]
+    
+    COMPLIANCE --> AUDIT_LOGS[Access Audit Logs]
+    COMPLIANCE --> REGULATORY_REPORTS[Generate Regulatory Reports]
+    COMPLIANCE --> DATA_PRIVACY[Data Privacy Compliance]
+    COMPLIANCE --> CERTIFICATION_TRACKING[Professional Certification Tracking]
+```
+
+### **Emergency Healthcare Access Flow**
+
+```mermaid
+graph TD
+    EMERGENCY_START([Emergency Situation]) --> ACCESS_METHOD{Access Method}
+    
+    ACCESS_METHOD -->|Mobile App| EMERGENCY_BUTTON[Emergency Button]
+    ACCESS_METHOD -->|Voice Call| EMERGENCY_HOTLINE[Emergency Hotline]
+    ACCESS_METHOD -->|QR Code Scan| QR_EMERGENCY[QR Code Emergency Access]
+    
+    EMERGENCY_BUTTON --> LOCATION[Detect Current Location]
+    EMERGENCY_HOTLINE --> LOCATION
+    QR_EMERGENCY --> LOCATION
+    
+    LOCATION --> CRITICAL_DATA[Access Critical Health Data]
+    CRITICAL_DATA --> CONSENT_OVERRIDE[Emergency Consent Override]
+    CONSENT_OVERRIDE --> HEALTH_SUMMARY[Generate Emergency Health Summary]
+    
+    HEALTH_SUMMARY --> NEARBY_SERVICES[Find Nearby Emergency Services]
+    NEARBY_SERVICES --> SERVICE_SELECTION[Select Service Type<br/>Hospital/Ambulance/Pharmacy]
+    
+    SERVICE_SELECTION --> HOSPITAL_SEARCH[Find Nearest Hospitals]
+    SERVICE_SELECTION --> AMBULANCE_DISPATCH[Dispatch Ambulance]
+    SERVICE_SELECTION --> PHARMACY_LOCATE[Locate 24/7 Pharmacy]
+    
+    HOSPITAL_SEARCH --> BED_AVAILABILITY[Check Bed Availability]
+    BED_AVAILABILITY --> HOSPITAL_BOOKING[Reserve Emergency Bed]
+    HOSPITAL_BOOKING --> SHARE_HEALTH_DATA[Share Critical Health Data]
+    
+    AMBULANCE_DISPATCH --> AMBULANCE_TRACKING[Track Ambulance]
+    AMBULANCE_TRACKING --> ETA[Estimated Time of Arrival]
+    ETA --> HOSPITAL_COORDINATION[Coordinate with Hospital]
+    
+    PHARMACY_LOCATE --> MEDICATION_AVAILABILITY[Check Medication Availability]
+    MEDICATION_AVAILABILITY --> PHARMACY_NAVIGATION[Navigate to Pharmacy]
+    
+    SHARE_HEALTH_DATA --> EMERGENCY_CONTACTS[Notify Emergency Contacts]
+    HOSPITAL_COORDINATION --> EMERGENCY_CONTACTS
+    PHARMACY_NAVIGATION --> EMERGENCY_CONTACTS
+    
+    EMERGENCY_CONTACTS --> FAMILY_NOTIFICATION[Family/Caregiver Notification]
+    EMERGENCY_CONTACTS --> DOCTOR_ALERT[Primary Doctor Alert]
+    EMERGENCY_CONTACTS --> INSURANCE_NOTIFICATION[Insurance Provider Notification]
 ```
 
 ---
 
-## **Data Flow Architecture**
+## **ABDM-Compliant Data Flow Architecture**
 
-### **Service Discovery & Appointment Booking Flow**
+### **ABHA Registration & Verification Flow**
 
 ```mermaid
 sequenceDiagram
     participant Client
     participant BFF
-    participant IAM
-    participant OrgMgmt
-    participant AptMgmt
-    participant Payment
-    participant Notification
-    participant UHI
+    participant ABHA_Service
+    participant ABDM_Gateway
+    participant Aadhaar_API
+    participant Face_Auth
     participant Supabase
+    participant Audit_Log
 
-    Client->>BFF: Search for providers
-    BFF->>IAM: Validate user token
-    IAM-->>BFF: Token valid
+    Client->>BFF: Create ABHA request
+    BFF->>ABHA_Service: Initiate ABHA creation
+    ABHA_Service->>ABDM_Gateway: Request ABHA creation
     
-    BFF->>OrgMgmt: Get available providers
-    OrgMgmt->>UHI: Query UHI network
-    UHI-->>OrgMgmt: Provider list
-    OrgMgmt->>Supabase: Fetch provider details
-    Supabase-->>OrgMgmt: Provider data
-    OrgMgmt-->>BFF: Providers with availability
-    BFF-->>Client: Search results
+    ABDM_Gateway->>Aadhaar_API: Validate Aadhaar number
+    Aadhaar_API-->>ABDM_Gateway: Send OTP
+    ABDM_Gateway-->>ABHA_Service: OTP sent confirmation
+    ABHA_Service-->>BFF: OTP sent
+    BFF-->>Client: Enter OTP screen
     
-    Client->>BFF: Select provider & time slot
-    BFF->>AptMgmt: Create appointment
-    AptMgmt->>Supabase: Check availability
-    Supabase-->>AptMgmt: Slot available
+    Client->>BFF: Submit OTP
+    BFF->>ABHA_Service: Verify OTP
+    ABHA_Service->>ABDM_Gateway: Verify OTP with Aadhaar
+    ABDM_Gateway->>Aadhaar_API: Validate OTP
+    Aadhaar_API-->>ABDM_Gateway: OTP valid + Demographics
     
-    AptMgmt->>Payment: Calculate charges
-    Payment-->>AptMgmt: Payment amount
-    AptMgmt-->>BFF: Appointment details
-    BFF-->>Client: Appointment summary
+    ABDM_Gateway-->>ABHA_Service: Demographics verified
+    ABHA_Service-->>BFF: Proceed to face authentication
+    BFF-->>Client: Face authentication screen
     
-    Client->>BFF: Confirm booking with payment
-    BFF->>Payment: Process payment
-    Payment->>External: Payment gateway
-    External-->>Payment: Payment success
+    Client->>BFF: Capture face image
+    BFF->>ABHA_Service: Submit face data
+    ABHA_Service->>Face_Auth: Validate face against Aadhaar
+    Face_Auth-->>ABHA_Service: Face verified
     
-    Payment->>AptMgmt: Payment confirmed
-    AptMgmt->>Supabase: Create appointment
-    Supabase-->>AptMgmt: Appointment created
+    ABHA_Service->>ABDM_Gateway: Complete ABHA creation
+    ABDM_Gateway-->>ABHA_Service: ABHA created (14-digit ID)
+    ABHA_Service->>Supabase: Store ABHA mapping
+    ABHA_Service->>Audit_Log: Log ABHA creation
     
-    AptMgmt->>Notification: Send confirmations
-    Notification->>Client: Push notification
-    Notification->>Provider: Email/SMS notification
-    
-    AptMgmt-->>BFF: Booking confirmed
-    BFF-->>Client: Success response
+    ABHA_Service-->>BFF: ABHA creation successful
+    BFF-->>Client: ABHA account created
 ```
 
-### **Authentication & Authorization Flow**
+### **UHI Service Discovery & Booking Flow**
 
 ```mermaid
 sequenceDiagram
     participant Client
     participant BFF
-    participant IAM
-    participant Supabase
-    participant Redis
+    participant UHI_Gateway
+    participant Provider_Network
+    participant HFR_Registry
+    parameter Insurance_Service
+    participant NHCX_Gateway
+    participant Payment_Service
+    participant Consent_Manager
 
-    Client->>BFF: Login request
-    BFF->>IAM: Authenticate user
-    IAM->>Supabase: Validate credentials
-    Supabase-->>IAM: User data
+    Client->>BFF: Search healthcare services
+    BFF->>UHI_Gateway: UHI search request
+    UHI_Gateway->>Provider_Network: Query available providers
+    UHI_Gateway->>HFR_Registry: Validate facility registrations
     
-    IAM->>IAM: Generate JWT tokens
-    IAM->>Redis: Store refresh token
-    IAM-->>BFF: Access & refresh tokens
-    BFF-->>Client: Login success with tokens
+    Provider_Network-->>UHI_Gateway: Provider list with availability
+    HFR_Registry-->>UHI_Gateway: Facility details & certifications
+    UHI_Gateway-->>BFF: Compiled provider results
+    BFF-->>Client: Display providers with ratings
     
-    Note over Client: Subsequent requests
-    Client->>BFF: API request with JWT
-    BFF->>IAM: Validate JWT
-    IAM->>IAM: Verify token signature
-    IAM-->>BFF: Token valid + user roles
-    BFF->>Service: Forward request with context
-    Service-->>BFF: Response
-    BFF-->>Client: API response
+    Client->>BFF: Select provider & service
+    BFF->>Insurance_Service: Check coverage eligibility
+    Insurance_Service->>NHCX_Gateway: Verify insurance benefits
+    NHCX_Gateway-->>Insurance_Service: Coverage details
+    Insurance_Service-->>BFF: Coverage confirmed
     
-    Note over Client: Token refresh
-    Client->>BFF: Refresh token request
-    BFF->>IAM: Validate refresh token
-    IAM->>Redis: Check token validity
-    Redis-->>IAM: Token valid
-    IAM->>IAM: Generate new access token
-    IAM-->>BFF: New access token
-    BFF-->>Client: New token
+    BFF->>Consent_Manager: Request data sharing consent
+    Consent_Manager-->>Client: Consent approval interface
+    Client->>Consent_Manager: Grant consent
+    Consent_Manager-->>BFF: Consent granted
+    
+    BFF->>UHI_Gateway: Create booking request
+    UHI_Gateway->>Provider_Network: Reserve appointment slot
+    Provider_Network-->>UHI_Gateway: Slot reserved
+    
+    UHI_Gateway->>Payment_Service: Calculate payment amount
+    Payment_Service-->>UHI_Gateway: Payment details
+    UHI_Gateway-->>BFF: Booking confirmation with payment
+    BFF-->>Client: Payment gateway
+    
+    Client->>Payment_Service: Complete payment
+    Payment_Service->>UHI_Gateway: Payment successful
+    UHI_Gateway->>Provider_Network: Confirm booking
+    Provider_Network-->>UHI_Gateway: Booking confirmed
+    
+    UHI_Gateway-->>BFF: Final confirmation
+    BFF-->>Client: Appointment booked successfully
+```
+
+### **FHIR R4 Health Information Exchange Flow**
+
+```mermaid
+sequenceDiagram
+    participant Patient_App
+    participant EHR_Service
+    participant Consent_Manager
+    participant HIP
+    participant HIU
+    participant FHIR_Store
+    participant Audit_Log
+
+    Patient_App->>Consent_Manager: Grant data access consent
+    Consent_Manager->>HIP: Consent artefact created
+    HIP-->>Consent_Manager: Consent stored
+    
+    HIU->>Consent_Manager: Request patient data access
+    Consent_Manager->>HIP: Verify consent permissions
+    HIP-->>Consent_Manager: Consent validated
+    
+    Consent_Manager-->>HIU: Data access approved
+    HIU->>HIP: Request health information
+    HIP->>EHR_Service: Fetch patient records
+    
+    EHR_Service->>FHIR_Store: Query FHIR resources
+    FHIR_Store-->>EHR_Service: Patient, Observation, DiagnosticReport
+    EHR_Service->>EHR_Service: Create FHIR Bundle
+    
+    EHR_Service-->>HIP: FHIR R4 compliant bundle
+    HIP->>HIP: Encrypt sensitive data
+    HIP-->>HIU: Encrypted health data bundle
+    
+    HIU->>HIU: Decrypt and process data
+    HIU->>FHIR_Store: Store received data (if authorized)
+    HIU->>Audit_Log: Log data access event
+    HIP->>Audit_Log: Log data sharing event
+    
+    HIU-->>Patient_App: Data successfully shared
+    Patient_App->>Consent_Manager: View data sharing history
+```
+
+### **NHCX Claims Processing Flow**
+
+```mermaid
+sequenceDiagram
+    participant Provider
+    participant NHCX_Service
+    participant Insurance_Provider
+    participant Patient
+    participant Payment_Service
+    participant Audit_Log
+
+    Provider->>NHCX_Service: Submit preauthorization request
+    NHCX_Service->>Insurance_Provider: Forward preauth request
+    Insurance_Provider->>Insurance_Provider: Review medical necessity
+    Insurance_Provider-->>NHCX_Service: Preauth approved/denied
+    NHCX_Service-->>Provider: Preauth response
+    
+    Note over Provider,Patient: Treatment provided
+    
+    Provider->>NHCX_Service: Submit treatment claim
+    NHCX_Service->>Insurance_Provider: Process claim bundle
+    Insurance_Provider->>Insurance_Provider: Validate claim against policy
+    
+    alt Claim Approved
+        Insurance_Provider-->>NHCX_Service: Claim approved
+        NHCX_Service->>Payment_Service: Initiate payment
+        Payment_Service->>Provider: Payment processed
+        Payment_Service->>Patient: Payment notification
+        NHCX_Service->>Audit_Log: Log successful claim
+    else Claim Denied
+        Insurance_Provider-->>NHCX_Service: Claim denied with reason
+        NHCX_Service-->>Provider: Denial notification
+        NHCX_Service->>Audit_Log: Log claim denial
+        Provider->>Patient: Bill patient directly
+    end
+    
+    NHCX_Service-->>Provider: Final claim status
+    Provider->>Patient: Treatment summary & receipt
+```
+
+### **Emergency Healthcare Data Access Flow**
+
+```mermaid
+sequenceDiagram
+    participant Emergency_Contact
+    participant Emergency_Service
+    participant Consent_Manager
+    participant EHR_Service
+    participant ABHA_Service
+    participant Emergency_Provider
+    participant Audit_Log
+
+    Emergency_Contact->>Emergency_Service: Emergency access request
+    Emergency_Service->>ABHA_Service: Verify patient identity
+    ABHA_Service-->>Emergency_Service: Patient ABHA verified
+    
+    Emergency_Service->>Consent_Manager: Request emergency data access
+    Consent_Manager->>Consent_Manager: Apply emergency override
+    Consent_Manager-->>Emergency_Service: Emergency access granted
+    
+    Emergency_Service->>EHR_Service: Request critical health data
+    EHR_Service->>FHIR_Store: Query emergency health summary
+    FHIR_Store-->>EHR_Service: Critical health information
+    
+    EHR_Service->>EHR_Service: Generate emergency health summary
+    EHR_Service-->>Emergency_Service: Emergency health data
+    
+    Emergency_Service->>Emergency_Provider: Share critical information
+    Emergency_Provider->>Emergency_Provider: Provide emergency care
+    
+    Emergency_Service->>Audit_Log: Log emergency data access
+    Emergency_Service->>Patient: Notify emergency data access
+    Emergency_Service->>Emergency_Contact: Care status update
+    
+    Note over Emergency_Provider: Emergency care completed
+    
+    Emergency_Provider->>EHR_Service: Submit emergency care records
+    EHR_Service->>FHIR_Store: Store emergency care documentation
+    EHR_Service->>Audit_Log: Log emergency care records
+```
+
+### **Chronic Disease Management Data Flow**
+
+```mermaid
+sequenceDiagram
+    participant Patient_App
+    participant Chronic_Care_Service
+    participant Wearable_Devices
+    participant AI_Analytics
+    participant Healthcare_Provider
+    participant Alert_Service
+    participant Family_Caregiver
+
+    Patient_App->>Chronic_Care_Service: Submit daily health metrics
+    Wearable_Devices->>Chronic_Care_Service: Stream continuous monitoring data
+    
+    Chronic_Care_Service->>AI_Analytics: Analyze health trends
+    AI_Analytics->>AI_Analytics: Process ML algorithms
+    AI_Analytics-->>Chronic_Care_Service: Risk assessment & recommendations
+    
+    alt Normal Parameters
+        Chronic_Care_Service-->>Patient_App: Normal status & care tips
+    else Warning Threshold
+        Chronic_Care_Service->>Alert_Service: Generate health alert
+        Alert_Service->>Patient_App: Health warning notification
+        Alert_Service->>Healthcare_Provider: Provider alert
+        Alert_Service->>Family_Caregiver: Family notification
+    else Critical Threshold
+        Chronic_Care_Service->>Alert_Service: Critical health alert
+        Alert_Service->>Emergency_Service: Emergency protocol activation
+        Alert_Service->>Healthcare_Provider: Immediate provider notification
+        Alert_Service->>Family_Caregiver: Emergency family alert
+    end
+    
+    Healthcare_Provider->>Chronic_Care_Service: Review patient data
+    Healthcare_Provider->>Patient_App: Adjust treatment plan
+    Chronic_Care_Service->>EHR_Service: Update chronic care records
+    
+    Chronic_Care_Service->>AI_Analytics: Update ML models with outcomes
+    AI_Analytics-->>Chronic_Care_Service: Improved predictions
 ```
 
 ---

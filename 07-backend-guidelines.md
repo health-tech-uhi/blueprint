@@ -2,60 +2,205 @@
 
 ## Table of Contents
 1. [Server Architecture](#server-architecture)
-2. [API Design Standards](#api-design-standards)
-3. [Database Design](#database-design)
-4. [Caching Strategies](#caching-strategies)
-5. [Security Implementation](#security-implementation)
-6. [Performance Optimization](#performance-optimization)
-7. [Error Handling](#error-handling)
-8. [Logging & Monitoring](#logging--monitoring)
-9. [Testing Strategies](#testing-strategies)
-10. [Deployment & DevOps](#deployment--devops)
+2. [ABDM & Healthcare Compliance](#abdm--healthcare-compliance)
+3. [FHIR R4 Implementation](#fhir-r4-implementation)
+4. [UHI Protocol Integration](#uhi-protocol-integration)
+5. [API Design Standards](#api-design-standards)
+6. [Database Design](#database-design)
+7. [Caching Strategies](#caching-strategies)
+8. [Security Implementation](#security-implementation)
+9. [Performance Optimization](#performance-optimization)
+10. [Error Handling](#error-handling)
+11. [Logging & Monitoring](#logging--monitoring)
+12. [Testing Strategies](#testing-strategies)
+13. [Deployment & DevOps](#deployment--devops)
 
 ---
 
 ## Server Architecture
 
-### 1. Microservices Architecture with Rust
+### 1. ABDM-Compliant Microservices Architecture
 ```rust
-// Main gRPC server structure using Tonic
+// ABDM-compliant microservices with healthcare-specific patterns
 use tonic::{transport::Server, Request, Response, Status};
 use tonic_reflection::server::Builder as ReflectionBuilder;
 use tower::ServiceBuilder;
 use tower_http::trace::TraceLayer;
 
 #[derive(Clone)]
-pub struct AppState {
+pub struct HealthcareAppState {
     db: Arc<PgPool>,
     redis: Arc<Redis>,
     config: Arc<Config>,
+    fhir_client: Arc<FhirClient>,
+    uhi_gateway: Arc<UhiGateway>,
+    abdm_integration: Arc<AbdmIntegration>,
 }
 
-pub async fn create_grpc_server(state: AppState) -> Result<(), Box<dyn std::error::Error>> {
+pub async fn create_healthcare_grpc_server(state: HealthcareAppState) -> Result<(), Box<dyn std::error::Error>> {
     let addr = "0.0.0.0:50051".parse()?;
     
-    let patient_service = PatientServiceImpl::new(state.clone());
-    let appointment_service = AppointmentServiceImpl::new(state.clone());
-    let payment_service = PaymentServiceImpl::new(state);
+    // Healthcare-specific services
+    let abha_service = AbhaServiceImpl::new(state.clone());
+    let ehr_service = EhrServiceImpl::new(state.clone());
+    let hpr_service = HprServiceImpl::new(state.clone());
+    let hfr_service = HfrServiceImpl::new(state.clone());
+    let nhcx_service = NhcxServiceImpl::new(state.clone());
+    let consent_service = ConsentServiceImpl::new(state.clone());
+    let uhi_gateway_service = UhiGatewayServiceImpl::new(state);
     
     let reflection_service = ReflectionBuilder::configure()
-        .register_encoded_file_descriptor_set(include_bytes!("../proto/descriptor.bin"))
+        .register_encoded_file_descriptor_set(include_bytes!("../proto/healthcare_descriptor.bin"))
         .build()?;
     
     Server::builder()
         .layer(
             ServiceBuilder::new()
                 .layer(TraceLayer::new_for_grpc())
-                .layer(tower::middleware::from_fn(auth_interceptor))
+                .layer(tower::middleware::from_fn(healthcare_auth_interceptor))
+                .layer(tower::middleware::from_fn(abdm_compliance_interceptor))
         )
         .add_service(reflection_service)
-        .add_service(patient_service_server::PatientServiceServer::new(patient_service))
-        .add_service(appointment_service_server::AppointmentServiceServer::new(appointment_service))
-        .add_service(payment_service_server::PaymentServiceServer::new(payment_service))
+        .add_service(abha_service_server::AbhaServiceServer::new(abha_service))
+        .add_service(ehr_service_server::EhrServiceServer::new(ehr_service))
+        .add_service(hpr_service_server::HprServiceServer::new(hpr_service))
+        .add_service(hfr_service_server::HfrServiceServer::new(hfr_service))
+        .add_service(nhcx_service_server::NhcxServiceServer::new(nhcx_service))
+        .add_service(consent_service_server::ConsentServiceServer::new(consent_service))
+        .add_service(uhi_gateway_service_server::UhiGatewayServiceServer::new(uhi_gateway_service))
         .serve(addr)
         .await?;
     
     Ok(())
+}
+
+// Healthcare-specific interceptors
+pub fn healthcare_auth_interceptor(req: Request<()>) -> Result<Request<()>, Status> {
+    // ABHA-based authentication validation
+    let token = extract_healthcare_token(&req)?;
+    let claims = validate_healthcare_jwt(token)?;
+    
+    // Validate ABHA ID if present
+    if let Some(abha_id) = claims.abha_id {
+        validate_abha_format(&abha_id)?;
+    }
+    
+    // Add healthcare claims to request
+    let mut req = req;
+    req.extensions_mut().insert(claims);
+    Ok(req)
+}
+
+pub fn abdm_compliance_interceptor(req: Request<()>) -> Result<Request<()>, Status> {
+    // Ensure ABDM compliance for all healthcare operations
+    let metadata = req.metadata();
+    
+    // Validate required ABDM headers
+    if !metadata.contains_key("x-cm-id") {
+        return Err(Status::invalid_argument("Missing consent manager ID"));
+    }
+    
+    if !metadata.contains_key("x-hip-id") && !metadata.contains_key("x-hiu-id") {
+        return Err(Status::invalid_argument("Missing HIP or HIU identifier"));
+    }
+    
+    Ok(req)
+}
+```
+
+### 2. Healthcare Domain Services
+```rust
+// ABDM-compliant domain services with healthcare workflows
+pub mod healthcare_domain {
+    use super::*;
+    
+    pub mod entities {
+        #[derive(Debug, Clone, Serialize, Deserialize)]
+        pub struct AbhaUser {
+            pub abha_id: String,
+            pub abha_number: String,
+            pub name: String,
+            pub gender: String,
+            pub date_of_birth: NaiveDate,
+            pub mobile: String,
+            pub email: Option<String>,
+            pub address: Option<Address>,
+            pub kyc_verified: bool,
+            pub created_at: DateTime<Utc>,
+        }
+        
+        #[derive(Debug, Clone, Serialize, Deserialize)]
+        pub struct HealthcareProvider {
+            pub hpr_id: String,
+            pub name: String,
+            pub license_number: String,
+            pub qualification: Vec<Qualification>,
+            pub specialization: Vec<String>,
+            pub facility_id: Option<String>,
+            pub verified: bool,
+            pub registration_date: DateTime<Utc>,
+        }
+        
+        #[derive(Debug, Clone, Serialize, Deserialize)]
+        pub struct FhirResource {
+            pub resource_type: String,
+            pub id: String,
+            pub data: serde_json::Value,
+            pub version: String,
+            pub last_updated: DateTime<Utc>,
+        }
+    }
+    
+    pub mod services {
+        use super::entities::*;
+        
+        pub struct AbhaService {
+            repository: Arc<dyn AbhaRepository>,
+            abdm_client: Arc<AbdmClient>,
+            event_bus: Arc<EventBus>,
+        }
+        
+        impl AbhaService {
+            pub async fn create_abha_account(&self, request: CreateAbhaRequest) -> Result<AbhaUser, ServiceError> {
+                // Validate Aadhaar and demographic data
+                self.validate_aadhaar_demographics(&request).await?;
+                
+                // Create ABHA account via ABDM
+                let abha_response = self.abdm_client
+                    .create_abha_account(request.clone())
+                    .await?;
+                
+                // Store ABHA user locally
+                let abha_user = self.repository
+                    .create_abha_user(abha_response.into())
+                    .await?;
+                
+                // Publish ABHA creation event
+                self.event_bus.publish(AbhaAccountCreated {
+                    abha_id: abha_user.abha_id.clone(),
+                    user_id: abha_user.abha_number.clone(),
+                }).await?;
+                
+                Ok(abha_user)
+            }
+            
+            pub async fn verify_abha_with_face_auth(&self, abha_id: &str, face_data: &[u8]) -> Result<bool, ServiceError> {
+                // Perform face authentication via ABDM
+                let verification_result = self.abdm_client
+                    .verify_face_authentication(abha_id, face_data)
+                    .await?;
+                
+                if verification_result.verified {
+                    // Update verification status
+                    self.repository
+                        .update_verification_status(abha_id, true)
+                        .await?;
+                }
+                
+                Ok(verification_result.verified)
+            }
+        }
+    }
 }
 ```
 
@@ -151,6 +296,572 @@ impl appointment_service_server::AppointmentService for AppointmentService {
         Ok(Response::new(AppointmentsResponse {
             appointments: appointments.into_iter().map(|a| a.into()).collect(),
         }))
+    }
+}
+```
+
+---
+
+## ABDM & Healthcare Compliance
+
+### 1. ABHA Integration Patterns
+```rust
+// ABHA account creation and management
+use serde::{Deserialize, Serialize};
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct CreateAbhaRequest {
+    pub mobile: String,
+    pub txn_id: String,
+    pub otp: String,
+    pub name: String,
+    pub gender: String,
+    pub date_of_birth: String,
+    pub address: Option<AddressDto>,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct AbhaAccountResponse {
+    pub abha_id: String,
+    pub abha_number: String,
+    pub name: String,
+    pub token: String,
+    pub refresh_token: String,
+    pub expires_in: i64,
+}
+
+// ABHA service implementation
+pub struct AbdmClient {
+    client: reqwest::Client,
+    base_url: String,
+    client_id: String,
+    client_secret: String,
+}
+
+impl AbdmClient {
+    pub async fn generate_mobile_otp(&self, mobile: &str) -> Result<String, AbdmError> {
+        let request = serde_json::json!({
+            "mobile": mobile
+        });
+        
+        let response = self.client
+            .post(&format!("{}/api/v2/registration/aadhaar/generateOtp", self.base_url))
+            .header("Content-Type", "application/json")
+            .json(&request)
+            .send()
+            .await?;
+            
+        let otp_response: OtpResponse = response.json().await?;
+        Ok(otp_response.txn_id)
+    }
+    
+    pub async fn verify_mobile_otp(&self, mobile: &str, otp: &str, txn_id: &str) -> Result<String, AbdmError> {
+        let request = serde_json::json!({
+            "mobile": mobile,
+            "otp": otp,
+            "txnId": txn_id
+        });
+        
+        let response = self.client
+            .post(&format!("{}/api/v2/registration/aadhaar/verifyOtp", self.base_url))
+            .header("Content-Type", "application/json")
+            .json(&request)
+            .send()
+            .await?;
+            
+        let verify_response: VerifyOtpResponse = response.json().await?;
+        Ok(verify_response.txn_id)
+    }
+    
+    pub async fn create_abha_account(&self, request: CreateAbhaRequest) -> Result<AbhaAccountResponse, AbdmError> {
+        let response = self.client
+            .post(&format!("{}/api/v2/registration/aadhaar/createAccount", self.base_url))
+            .header("Content-Type", "application/json")
+            .header("Authorization", &format!("Bearer {}", self.get_access_token().await?))
+            .json(&request)
+            .send()
+            .await?;
+            
+        let abha_response: AbhaAccountResponse = response.json().await?;
+        Ok(abha_response)
+    }
+}
+```
+
+### 2. Healthcare Professional Registry (HPR) Integration
+```rust
+// HPR registration and verification
+#[derive(Debug, Serialize, Deserialize)]
+pub struct HprRegistrationRequest {
+    pub doctor_name: String,
+    pub mobile_number: String,
+    pub email_id: Option<String>,
+    pub year_of_registration: String,
+    pub state_medical_council: String,
+    pub registration_number: String,
+    pub qualification: Vec<QualificationDto>,
+    pub specialization: Option<String>,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct HprVerificationResponse {
+    pub hpr_id: String,
+    pub verified: bool,
+    pub license_valid: bool,
+    pub registration_details: RegistrationDetails,
+}
+
+pub struct HprClient {
+    client: reqwest::Client,
+    base_url: String,
+    api_key: String,
+}
+
+impl HprClient {
+    pub async fn register_healthcare_professional(&self, request: HprRegistrationRequest) -> Result<String, HprError> {
+        let response = self.client
+            .post(&format!("{}/api/v1/professional/register", self.base_url))
+            .header("Content-Type", "application/json")
+            .header("Authorization", &format!("Bearer {}", self.api_key))
+            .json(&request)
+            .send()
+            .await?;
+            
+        let registration_response: HprRegistrationResponse = response.json().await?;
+        Ok(registration_response.hpr_id)
+    }
+    
+    pub async fn verify_professional_license(&self, hpr_id: &str) -> Result<HprVerificationResponse, HprError> {
+        let response = self.client
+            .get(&format!("{}/api/v1/professional/{}/verify", self.base_url, hpr_id))
+            .header("Authorization", &format!("Bearer {}", self.api_key))
+            .send()
+            .await?;
+            
+        let verification_response: HprVerificationResponse = response.json().await?;
+        Ok(verification_response)
+    }
+}
+```
+
+### 3. Health Facility Registry (HFR) Integration
+```rust
+// HFR facility registration and management
+#[derive(Debug, Serialize, Deserialize)]
+pub struct HfrRegistrationRequest {
+    pub facility_name: String,
+    pub facility_type: String,
+    pub facility_sub_type: String,
+    pub address: FacilityAddress,
+    pub contact_details: ContactDetails,
+    pub services_offered: Vec<String>,
+    pub accreditation: Option<AccreditationDetails>,
+    pub ownership: String,
+}
+
+pub struct HfrClient {
+    client: reqwest::Client,
+    base_url: String,
+    api_key: String,
+}
+
+impl HfrClient {
+    pub async fn register_facility(&self, request: HfrRegistrationRequest) -> Result<String, HfrError> {
+        let response = self.client
+            .post(&format!("{}/api/v1/facility/register", self.base_url))
+            .header("Content-Type", "application/json")
+            .header("Authorization", &format!("Bearer {}", self.api_key))
+            .json(&request)
+            .send()
+            .await?;
+            
+        let registration_response: HfrRegistrationResponse = response.json().await?;
+        Ok(registration_response.facility_id)
+    }
+    
+    pub async fn update_facility_services(&self, facility_id: &str, services: Vec<String>) -> Result<(), HfrError> {
+        let request = serde_json::json!({
+            "services_offered": services
+        });
+        
+        self.client
+            .put(&format!("{}/api/v1/facility/{}/services", self.base_url, facility_id))
+            .header("Content-Type", "application/json")
+            .header("Authorization", &format!("Bearer {}", self.api_key))
+            .json(&request)
+            .send()
+            .await?;
+            
+        Ok(())
+    }
+}
+```
+
+---
+
+## FHIR R4 Implementation
+
+### 1. FHIR Resource Management
+```rust
+// FHIR R4 resource structures and operations
+use fhir_sdk::{Patient, Observation, DiagnosticReport, Medication, Bundle};
+
+#[derive(Debug, Clone)]
+pub struct FhirService {
+    client: Arc<FhirClient>,
+    repository: Arc<dyn FhirRepository>,
+    validator: Arc<FhirValidator>,
+}
+
+impl FhirService {
+    pub async fn create_patient_resource(&self, patient_data: PatientDto) -> Result<Patient, FhirError> {
+        // Convert to FHIR Patient resource
+        let fhir_patient = Patient {
+            id: Some(patient_data.id.to_string()),
+            identifier: vec![
+                Identifier {
+                    use_: Some("official".to_string()),
+                    system: Some("https://abdm.gov.in/abha".to_string()),
+                    value: Some(patient_data.abha_id),
+                }
+            ],
+            name: vec![
+                HumanName {
+                    use_: Some("official".to_string()),
+                    given: vec![patient_data.first_name],
+                    family: Some(patient_data.last_name),
+                }
+            ],
+            gender: Some(patient_data.gender),
+            birth_date: Some(patient_data.date_of_birth),
+            telecom: vec![
+                ContactPoint {
+                    system: Some("phone".to_string()),
+                    value: Some(patient_data.phone),
+                    use_: Some("mobile".to_string()),
+                },
+                ContactPoint {
+                    system: Some("email".to_string()),
+                    value: Some(patient_data.email),
+                }
+            ],
+            address: patient_data.address.map(|addr| vec![Address {
+                use_: Some("home".to_string()),
+                line: vec![addr.street],
+                city: Some(addr.city),
+                state: Some(addr.state),
+                postal_code: Some(addr.postal_code),
+                country: Some("IN".to_string()),
+            }]),
+            ..Default::default()
+        };
+        
+        // Validate FHIR resource
+        self.validator.validate_patient(&fhir_patient)?;
+        
+        // Store in repository
+        let stored_patient = self.repository.save_patient(fhir_patient).await?;
+        
+        Ok(stored_patient)
+    }
+    
+    pub async fn create_observation(&self, observation_data: ObservationDto) -> Result<Observation, FhirError> {
+        let fhir_observation = Observation {
+            id: Some(Uuid::new_v4().to_string()),
+            status: "final".to_string(),
+            category: vec![
+                CodeableConcept {
+                    coding: vec![
+                        Coding {
+                            system: Some("http://terminology.hl7.org/CodeSystem/observation-category".to_string()),
+                            code: Some("vital-signs".to_string()),
+                            display: Some("Vital Signs".to_string()),
+                        }
+                    ]
+                }
+            ],
+            code: CodeableConcept {
+                coding: vec![
+                    Coding {
+                        system: Some("http://loinc.org".to_string()),
+                        code: Some(observation_data.loinc_code),
+                        display: Some(observation_data.display_name),
+                    }
+                ]
+            },
+            subject: Reference {
+                reference: Some(format!("Patient/{}", observation_data.patient_id)),
+            },
+            effective_date_time: Some(observation_data.effective_date),
+            value_quantity: observation_data.value.map(|val| Quantity {
+                value: Some(val),
+                unit: observation_data.unit,
+                system: Some("http://unitsofmeasure.org".to_string()),
+                code: observation_data.unit_code,
+            }),
+            ..Default::default()
+        };
+        
+        self.validator.validate_observation(&fhir_observation)?;
+        let stored_observation = self.repository.save_observation(fhir_observation).await?;
+        
+        Ok(stored_observation)
+    }
+}
+```
+
+### 2. FHIR Bundle Operations
+```rust
+// FHIR Bundle creation for clinical documents
+pub struct FhirBundleService {
+    repository: Arc<dyn FhirRepository>,
+}
+
+impl FhirBundleService {
+    pub async fn create_clinical_document_bundle(
+        &self,
+        patient_id: &str,
+        encounter_id: &str,
+        resources: Vec<FhirResource>,
+    ) -> Result<Bundle, FhirError> {
+        let bundle = Bundle {
+            id: Some(Uuid::new_v4().to_string()),
+            type_: "document".to_string(),
+            timestamp: Some(Utc::now()),
+            entry: resources.into_iter().map(|resource| BundleEntry {
+                id: Some(Uuid::new_v4().to_string()),
+                resource: Some(resource),
+                request: None,
+                response: None,
+            }).collect(),
+            identifier: Some(Identifier {
+                system: Some("https://healthtech-uhi.com/bundle".to_string()),
+                value: Some(format!("{}_{}", patient_id, encounter_id)),
+            }),
+            ..Default::default()
+        };
+        
+        let stored_bundle = self.repository.save_bundle(bundle).await?;
+        Ok(stored_bundle)
+    }
+    
+    pub async fn create_nhcx_claim_bundle(&self, claim_data: ClaimDto) -> Result<Bundle, FhirError> {
+        // Create NHCX-compliant claim bundle
+        let claim_resource = Claim {
+            id: Some(claim_data.claim_id.clone()),
+            status: "active".to_string(),
+            type_: CodeableConcept {
+                coding: vec![
+                    Coding {
+                        system: Some("http://terminology.hl7.org/CodeSystem/claim-type".to_string()),
+                        code: Some("institutional".to_string()),
+                    }
+                ]
+            },
+            patient: Reference {
+                reference: Some(format!("Patient/{}", claim_data.patient_id)),
+            },
+            billable_period: Some(Period {
+                start: Some(claim_data.service_start_date),
+                end: Some(claim_data.service_end_date),
+            }),
+            insurer: Reference {
+                reference: Some(format!("Organization/{}", claim_data.insurer_id)),
+            },
+            provider: Reference {
+                reference: Some(format!("Organization/{}", claim_data.provider_id)),
+            },
+            priority: CodeableConcept {
+                coding: vec![
+                    Coding {
+                        system: Some("http://terminology.hl7.org/CodeSystem/processpriority".to_string()),
+                        code: Some("normal".to_string()),
+                    }
+                ]
+            },
+            total: Some(Money {
+                value: Some(claim_data.total_amount),
+                currency: Some("INR".to_string()),
+            }),
+            ..Default::default()
+        };
+        
+        let bundle = Bundle {
+            id: Some(Uuid::new_v4().to_string()),
+            type_: "collection".to_string(),
+            entry: vec![
+                BundleEntry {
+                    resource: Some(FhirResource::Claim(claim_resource)),
+                    ..Default::default()
+                }
+            ],
+            ..Default::default()
+        };
+        
+        Ok(bundle)
+    }
+}
+```
+
+---
+
+## UHI Protocol Integration
+
+### 1. UHI Gateway Implementation
+```rust
+// UHI protocol message handling and routing
+use ed25519_dalek::{Keypair, Signature, Signer, Verifier};
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct UhiProtocolMessage {
+    pub context: UhiContext,
+    pub message: serde_json::Value,
+    pub signature: Option<String>,
+}
+
+pub struct UhiGateway {
+    keypair: Keypair,
+    network_registry: Arc<NetworkRegistry>,
+    message_validator: Arc<UhiMessageValidator>,
+}
+
+impl UhiGateway {
+    pub async fn process_search_request(&self, message: UhiProtocolMessage) -> Result<UhiProtocolMessage, UhiError> {
+        // Validate message signature
+        self.verify_message_signature(&message)?;
+        
+        // Validate UHI context
+        self.message_validator.validate_context(&message.context)?;
+        
+        // Extract search parameters
+        let search_params: SearchRequest = serde_json::from_value(message.message)?;
+        
+        // Search healthcare providers
+        let providers = self.search_providers(search_params).await?;
+        
+        // Create response message
+        let response_message = self.create_search_response(providers, &message.context).await?;
+        
+        Ok(response_message)
+    }
+    
+    pub async fn process_select_request(&self, message: UhiProtocolMessage) -> Result<UhiProtocolMessage, UhiError> {
+        self.verify_message_signature(&message)?;
+        
+        let select_params: SelectRequest = serde_json::from_value(message.message)?;
+        
+        // Validate provider and service availability
+        let availability = self.check_service_availability(&select_params).await?;
+        
+        let response_message = self.create_select_response(availability, &message.context).await?;
+        
+        Ok(response_message)
+    }
+    
+    pub async fn process_init_request(&self, message: UhiProtocolMessage) -> Result<UhiProtocolMessage, UhiError> {
+        self.verify_message_signature(&message)?;
+        
+        let init_params: InitRequest = serde_json::from_value(message.message)?;
+        
+        // Initialize booking process
+        let booking_details = self.initialize_booking(&init_params).await?;
+        
+        let response_message = self.create_init_response(booking_details, &message.context).await?;
+        
+        Ok(response_message)
+    }
+    
+    pub async fn process_confirm_request(&self, message: UhiProtocolMessage) -> Result<UhiProtocolMessage, UhiError> {
+        self.verify_message_signature(&message)?;
+        
+        let confirm_params: ConfirmRequest = serde_json::from_value(message.message)?;
+        
+        // Confirm booking
+        let confirmed_booking = self.confirm_booking(&confirm_params).await?;
+        
+        let response_message = self.create_confirm_response(confirmed_booking, &message.context).await?;
+        
+        Ok(response_message)
+    }
+    
+    fn sign_message(&self, message: &UhiProtocolMessage) -> Result<String, UhiError> {
+        let message_bytes = serde_json::to_vec(&message)?;
+        let signature = self.keypair.sign(&message_bytes);
+        Ok(base64::encode(signature.to_bytes()))
+    }
+    
+    fn verify_message_signature(&self, message: &UhiProtocolMessage) -> Result<(), UhiError> {
+        let signature_b64 = message.signature.as_ref()
+            .ok_or(UhiError::MissingSignature)?;
+            
+        let signature_bytes = base64::decode(signature_b64)?;
+        let signature = Signature::from_bytes(&signature_bytes)?;
+        
+        // Create message without signature for verification
+        let mut unsigned_message = message.clone();
+        unsigned_message.signature = None;
+        let message_bytes = serde_json::to_vec(&unsigned_message)?;
+        
+        self.keypair.public.verify(&message_bytes, &signature)
+            .map_err(|_| UhiError::InvalidSignature)?;
+            
+        Ok(())
+    }
+}
+```
+
+### 2. UHI Message Validation
+```rust
+// UHI protocol message validation
+pub struct UhiMessageValidator;
+
+impl UhiMessageValidator {
+    pub fn validate_context(&self, context: &UhiContext) -> Result<(), UhiError> {
+        // Validate required fields
+        if context.domain.is_empty() {
+            return Err(UhiError::ValidationError("Domain is required".to_string()));
+        }
+        
+        if context.country != "IND" {
+            return Err(UhiError::ValidationError("Country must be IND".to_string()));
+        }
+        
+        if context.core_version.is_empty() {
+            return Err(UhiError::ValidationError("Core version is required".to_string()));
+        }
+        
+        // Validate UHI participant IDs
+        self.validate_participant_id(&context.bap_id)?;
+        
+        if let Some(bpp_id) = &context.bpp_id {
+            self.validate_participant_id(bpp_id)?;
+        }
+        
+        // Validate timestamp
+        self.validate_timestamp(&context.timestamp)?;
+        
+        Ok(())
+    }
+    
+    fn validate_participant_id(&self, participant_id: &str) -> Result<(), UhiError> {
+        // UHI participant ID validation logic
+        if !participant_id.contains('.') {
+            return Err(UhiError::ValidationError("Invalid participant ID format".to_string()));
+        }
+        
+        Ok(())
+    }
+    
+    fn validate_timestamp(&self, timestamp: &DateTime<Utc>) -> Result<(), UhiError> {
+        let now = Utc::now();
+        let diff = now.signed_duration_since(*timestamp);
+        
+        // Allow 5 minutes tolerance
+        if diff.num_minutes().abs() > 5 {
+            return Err(UhiError::ValidationError("Timestamp is too old or too far in future".to_string()));
+        }
+        
+        Ok(())
     }
 }
 ```

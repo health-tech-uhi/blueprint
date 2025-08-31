@@ -1,6 +1,40 @@
-# **Project Rules**
+# **ABDM-Compliant Healthcare Platform Project Rules**
 
-## **Development Best Practices**
+## **Healthcare-Specific Development Standards**
+
+### **ABDM Ecosystem Compliance**
+
+#### **ABHA (Ayushman Bharat Health Account) Integration**
+- **Health ID Management**: All user authentication must support 14-digit ABHA Health IDs
+- **Demographic Verification**: Real-time validation with ABDM demographic services
+- **Consent Management**: Implement granular consent mechanisms for health data sharing
+- **QR Code Generation**: Support offline QR codes for healthcare provider scanning
+
+#### **UHI Protocol Implementation**
+- **Service Discovery**: Complete UHI-compliant healthcare service catalog
+- **Order Management**: Standardized appointment booking and service ordering
+- **Message Signing**: ed25519 cryptographic signing for all UHI messages
+- **Gateway Integration**: Proper UHI Gateway routing and protocol adherence
+
+#### **FHIR R4 Standards**
+- **Resource Validation**: All clinical data must conform to FHIR R4 specifications
+- **Bundle Management**: Support for Document, Message, and Collection bundles
+- **Terminology Services**: Integration with SNOMED CT, ICD-10, and LOINC
+- **Interoperability**: Seamless data exchange between healthcare providers
+
+### **Healthcare Data Security Standards**
+
+#### **Healthcare-Grade Encryption**
+- **Data at Rest**: AES-256 encryption for all healthcare data storage
+- **Data in Transit**: TLS 1.3 for all API communications
+- **Key Management**: Healthcare-specific key rotation and management
+- **Biometric Security**: Face authentication and multi-factor verification
+
+#### **Privacy Protection**
+- **Data Minimization**: Collect only necessary healthcare information
+- **Purpose Limitation**: Use health data only for declared medical purposes
+- **Consent Tracking**: Audit trail for all consent grants and revocations
+- **Right to Erasure**: Implement secure data deletion capabilities
 
 ### **Code Quality Standards**
 
@@ -8,24 +42,38 @@
 - **Formatting**: Use `rustfmt` with default settings for consistent code formatting
 - **Linting**: Apply `clippy` with `--deny warnings` to catch common mistakes
 - **Documentation**: All public APIs must have comprehensive doc comments
-- **Testing**: Minimum 80% code coverage for all business logic
+- **Testing**: Minimum 90% code coverage for healthcare business logic (increased from 80%)
 - **Error Handling**: Use `Result<T, E>` for all fallible operations
 - **Async Patterns**: Prefer `async/await` over manual future combinators
+- **Healthcare Audit**: All healthcare operations must include audit logging
 
 ```rust
-// Example: Good error handling pattern
+// Example: Healthcare-specific error handling pattern
 #[derive(Debug, thiserror::Error)]
-pub enum ServiceError {
+pub enum HealthcareServiceError {
     #[error("Database error: {0}")]
     Database(#[from] sqlx::Error),
-    #[error("Validation error: {message}")]
-    Validation { message: String },
-    #[error("Not found: {resource}")]
-    NotFound { resource: String },
+    #[error("FHIR validation error: {message}")]
+    FhirValidation { message: String, resource_type: String },
+    #[error("ABDM authentication error: {error_code}")]
+    AbdmAuth { error_code: String },
+    #[error("UHI protocol error: {0}")]
+    UhiProtocol(#[from] UhiError),
+    #[error("Healthcare consent required: {resource}")]
+    ConsentRequired { resource: String, patient_id: String },
+    #[error("HIPAA compliance violation: {details}")]
+    ComplianceViolation { details: String },
 }
 
-pub type ServiceResult<T> = Result<T, ServiceError>;
+pub type HealthcareResult<T> = Result<T, HealthcareServiceError>;
 ```
+
+#### **Healthcare Microservices Standards**
+- **Service Isolation**: Each healthcare domain (EHR, Consent, Analytics) in separate services
+- **gRPC Communication**: Use Tonic framework for inter-service communication
+- **Health Checks**: Comprehensive health endpoints for Kubernetes probes
+- **Circuit Breakers**: Implement failover for critical healthcare operations
+- **Rate Limiting**: Protect healthcare APIs from abuse and ensure availability
 
 #### **Frontend Development Standards**
 

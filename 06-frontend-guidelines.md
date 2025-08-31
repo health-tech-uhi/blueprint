@@ -1,25 +1,44 @@
-# Section 6: Frontend Guidelines
+# **ABDM-Compliant Healthcare Platform Frontend Guidelines**
 
 ## Table of Contents
-1. [Design Principles](#design-principles)
-2. [Component Architecture](#component-architecture)
-3. [State Management](#state-management)
-4. [Styling Standards](#styling-standards)
-5. [Performance Practices](#performance-practices)
-6. [Accessibility Guidelines](#accessibility-guidelines)
-7. [Testing Standards](#testing-standards)
-8. [Code Organization](#code-organization)
-9. [Platform-Specific Guidelines](#platform-specific-guidelines)
+1. [Healthcare-Specific Design Principles](#healthcare-specific-design-principles)
+2. [ABDM Integration Guidelines](#abdm-integration-guidelines)
+3. [Healthcare UI Component Architecture](#healthcare-ui-component-architecture)
+4. [Patient & Provider Experience Design](#patient--provider-experience-design)
+5. [State Management for Healthcare Data](#state-management-for-healthcare-data)
+6. [Healthcare-Focused Styling Standards](#healthcare-focused-styling-standards)
+7. [Medical Data Visualization](#medical-data-visualization)
+8. [Healthcare Performance Practices](#healthcare-performance-practices)
+9. [Medical Accessibility Guidelines](#medical-accessibility-guidelines)
+10. [Healthcare Security Integration](#healthcare-security-integration)
+11. [Testing Standards for Healthcare Apps](#testing-standards-for-healthcare-apps)
+12. [Code Organization for Healthcare Platform](#code-organization-for-healthcare-platform)
+13. [Platform-Specific Healthcare Guidelines](#platform-specific-healthcare-guidelines)
 
 ---
 
-## Design Principles
+## Healthcare-Specific Design Principles
 
-### 1. User-Centered Design
-- **Healthcare-First Approach**: Design with medical professionals and patients in mind
-- **Accessibility**: WCAG 2.1 AA compliance for all interfaces
-- **Cultural Sensitivity**: Support for multiple Indian languages and cultural contexts
-- **Trust & Safety**: Clear visual indicators for verified providers and secure transactions
+### 1. Medical-First User Experience
+- **Clinical Workflow Integration**: Design interfaces that fit into existing medical workflows
+- **Emergency-Ready Design**: Critical information and actions prominently displayed
+- **Medical Terminology**: Use standardized medical terms with patient-friendly explanations
+- **Trust & Credibility**: Clear verification badges for healthcare providers and secure transaction indicators
+- **Cultural Healthcare Sensitivity**: Support for diverse Indian healthcare practices and languages
+
+### 2. ABDM Ecosystem Design Standards
+- **Health ID Prominence**: Display ABHA Health ID in user interfaces with QR code access
+- **Consent Visualization**: Clear, understandable consent flows for health data sharing
+- **Provider Verification**: Visual indicators for HPR-verified healthcare professionals
+- **Facility Recognition**: Clear display of HFR-registered healthcare facilities
+- **UHI Compliance**: Standardized service discovery and booking interfaces
+
+### 3. Patient Safety & Privacy Design
+- **Data Sensitivity Indicators**: Visual cues for sensitive medical information
+- **Access Control Visibility**: Clear indication of who can access patient data
+- **Audit Trail Access**: Easy access to data sharing history and consent logs
+- **Emergency Override**: Clear emergency access procedures for critical situations
+- **Family Access Controls**: Intuitive family member healthcare management interfaces
 
 ### 2. Responsive Design Standards
 - **Mobile-First**: Design for mobile devices first, then scale up
@@ -39,39 +58,845 @@
 
 ---
 
-## Component Architecture
+## ABDM Integration Guidelines
 
-### 1. Atomic Design Pattern
+### 1. ABHA Health ID Integration
+```typescript
+// ABHA Health ID Display Component
+interface ABHADisplayProps {
+  healthId: string;
+  showQR?: boolean;
+  variant: 'full' | 'compact';
+}
+
+const ABHADisplay: React.FC<ABHADisplayProps> = ({ 
+  healthId, 
+  showQR = false, 
+  variant = 'full' 
+}) => {
+  const formatHealthId = (id: string) => {
+    return id.replace(/(\d{2})(\d{4})(\d{4})(\d{4})/, '$1-$2-$3-$4');
+  };
+
+  return (
+    <div className="abha-display bg-blue-50 border border-blue-200 rounded-lg p-4">
+      <div className="flex items-center gap-3">
+        <div className="abha-logo">
+          <img src="/icons/abha-logo.svg" alt="ABHA" className="w-8 h-8" />
+        </div>
+        <div>
+          <label className="text-sm font-medium text-blue-800">ABHA Health ID</label>
+          <div className="text-lg font-mono text-blue-900">
+            {formatHealthId(healthId)}
+          </div>
+        </div>
+        {showQR && (
+          <QRCodeGenerator value={healthId} size={64} />
+        )}
+      </div>
+    </div>
+  );
+};
 ```
-atoms/
-├── Button/
-├── Input/
-├── Icon/
-├── Badge/
-└── Avatar/
 
-molecules/
-├── SearchBox/
-├── AppointmentCard/
-├── MedicationItem/
-└── NotificationBanner/
+### 2. Consent Management Interface
+```typescript
+// Healthcare Consent Flow Component
+interface ConsentFlowProps {
+  dataTypes: string[];
+  purpose: string;
+  provider: HealthcareProvider;
+  onConsent: (consent: ConsentData) => void;
+}
 
-organisms/
-├── Header/
-├── PatientDashboard/
-├── ProviderSchedule/
-└── PaymentForm/
+const ConsentFlow: React.FC<ConsentFlowProps> = ({
+  dataTypes,
+  purpose,
+  provider,
+  onConsent
+}) => {
+  const [selectedData, setSelectedData] = useState<string[]>([]);
+  const [expiryDate, setExpiryDate] = useState<Date>();
 
-templates/
-├── PageLayout/
-├── DashboardLayout/
-└── AuthLayout/
-
-pages/
-├── HomePage/
-├── AppointmentBooking/
-└── ProfileSettings/
+  return (
+    <div className="consent-flow max-w-2xl mx-auto">
+      <div className="consent-header bg-green-50 p-6 rounded-t-lg">
+        <h3 className="text-xl font-semibold text-green-800">
+          Healthcare Data Sharing Consent
+        </h3>
+        <p className="text-green-700 mt-2">
+          {provider.name} is requesting access to your health data for: {purpose}
+        </p>
+      </div>
+      
+      <div className="consent-body p-6 border-x border-green-200">
+        <h4 className="font-medium mb-4">Select data to share:</h4>
+        {dataTypes.map((dataType) => (
+          <label key={dataType} className="flex items-center gap-3 py-2">
+            <input
+              type="checkbox"
+              checked={selectedData.includes(dataType)}
+              onChange={(e) => {
+                if (e.target.checked) {
+                  setSelectedData([...selectedData, dataType]);
+                } else {
+                  setSelectedData(selectedData.filter(d => d !== dataType));
+                }
+              }}
+            />
+            <span>{dataType}</span>
+          </label>
+        ))}
+        
+        <div className="mt-6">
+          <label className="block font-medium mb-2">Consent Expiry:</label>
+          <input
+            type="date"
+            min={new Date().toISOString().split('T')[0]}
+            onChange={(e) => setExpiryDate(new Date(e.target.value))}
+            className="border rounded-md px-3 py-2"
+          />
+        </div>
+      </div>
+      
+      <div className="consent-footer bg-gray-50 p-6 rounded-b-lg border border-green-200">
+        <div className="flex gap-4">
+          <button 
+            onClick={() => onConsent({ dataTypes: selectedData, expiryDate, purpose })}
+            className="bg-green-600 text-white px-6 py-2 rounded-md font-medium"
+            disabled={selectedData.length === 0}
+          >
+            Grant Consent
+          </button>
+          <button className="bg-gray-300 text-gray-700 px-6 py-2 rounded-md">
+            Deny
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
 ```
+
+### 3. UHI Service Discovery Interface
+```typescript
+// UHI-Compliant Service Search
+interface ServiceSearchProps {
+  searchType: 'provider' | 'service' | 'facility';
+  location?: GeolocationCoordinates;
+  onResults: (results: UHISearchResult[]) => void;
+}
+
+const UHIServiceSearch: React.FC<ServiceSearchProps> = ({
+  searchType,
+  location,
+  onResults
+}) => {
+  const [query, setQuery] = useState('');
+  const [filters, setFilters] = useState<UHIFilters>({});
+
+  return (
+    <div className="uhi-search bg-white rounded-lg shadow-lg p-6">
+      <div className="search-header flex items-center gap-4 mb-6">
+        <div className="flex-1">
+          <input
+            type="text"
+            placeholder={`Search for ${searchType}s...`}
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            className="w-full border border-gray-300 rounded-lg px-4 py-3"
+          />
+        </div>
+        <button className="bg-blue-600 text-white px-6 py-3 rounded-lg">
+          Search
+        </button>
+      </div>
+      
+      <UHIFilters 
+        searchType={searchType}
+        filters={filters}
+        onFiltersChange={setFilters}
+      />
+    </div>
+  );
+};
+```
+
+---
+
+## Healthcare UI Component Architecture
+
+### 1. Medical Atomic Design Pattern
+```
+healthcare-atoms/
+├── MedicalBadge/           # Drug allergy, condition severity badges
+├── VitalSign/              # Blood pressure, heart rate displays
+├── MedicationPill/         # Medication dosage indicators
+├── HealthScore/            # Health score visualizations
+└── EmergencyButton/        # Critical action buttons
+
+healthcare-molecules/
+├── PatientVitals/          # Vital signs collection
+├── MedicationSchedule/     # Medication timing display
+├── AppointmentSlot/        # Appointment time selections
+├── LabResultCard/          # Laboratory result display
+├── SymptomChecker/         # Symptom input interface
+└── InsuranceCard/          # Insurance information display
+
+healthcare-organisms/
+├── PatientProfile/         # Complete patient information
+├── DoctorSchedule/         # Provider availability calendar
+├── MedicalHistory/         # Patient's medical timeline
+├── HealthDashboard/        # Health metrics overview
+├── TeleconsultationRoom/   # Video consultation interface
+├── PrescriptionManager/    # Medication management
+├── LabReportsViewer/       # Medical reports interface
+└── EmergencyPanel/         # Critical care information
+
+healthcare-templates/
+├── PatientPortalLayout/    # Patient application layout
+├── ProviderDashboardLayout/# Healthcare provider interface
+├── TelehealthLayout/       # Telemedicine consultation layout
+├── AdminConsoleLayout/     # Healthcare admin interface
+└── EmergencyAccessLayout/  # Emergency care interface
+
+healthcare-pages/
+├── PatientRegistration/    # ABHA-enabled patient onboarding
+├── ProviderVerification/   # HPR integration for providers
+├── AppointmentBooking/     # UHI-compliant booking flow
+├── TeleconsultationRoom/   # Remote consultation interface
+├── HealthRecordViewer/     # FHIR-compliant record viewing
+├── InsuranceClaims/        # NHCX claims processing
+└── EmergencyAccess/        # Critical care data access
+```
+
+### 2. Healthcare Component Standards
+- **Medical Data Integrity**: All medical components validate FHIR R4 data formats
+- **Privacy by Design**: Components handle sensitive health data with appropriate security
+- **Emergency Accessibility**: Critical medical information prominently displayed
+- **Cultural Sensitivity**: Support for Indian healthcare practices and languages
+- **Provider Verification**: Visual indicators for verified healthcare professionals
+
+### 3. Medical Component Structure Template
+```typescript
+// MedicalComponent.tsx
+import React from 'react';
+import { validateFHIRResource } from '../../utils/fhir-validator';
+import { MedicalComponentProps } from './MedicalComponent.types';
+import { EncryptedWrapper } from './MedicalComponent.styles';
+
+export const MedicalComponent: React.FC<MedicalComponentProps> = ({
+  fhirData,
+  patientConsent,
+  emergencyAccess = false,
+  children,
+  ...restProps
+}) => {
+  // Validate FHIR data structure
+  const isValidFHIR = validateFHIRResource(fhirData);
+  
+  // Check consent for data access
+  const hasConsent = patientConsent?.includes(fhirData.resourceType) || emergencyAccess;
+  
+  if (!isValidFHIR) {
+    return <ErrorBoundary error="Invalid medical data format" />;
+  }
+  
+  if (!hasConsent) {
+    return <ConsentRequiredNotice resourceType={fhirData.resourceType} />;
+  }
+
+  return (
+    <EncryptedWrapper 
+      className={`medical-component ${emergencyAccess ? 'emergency-access' : ''}`}
+      {...restProps}
+    >
+      {children}
+    </EncryptedWrapper>
+  );
+};
+```
+
+---
+
+## Patient & Provider Experience Design
+
+### 1. Patient-Centric Interface Design
+```typescript
+// Patient Dashboard with Health Overview
+const PatientDashboard: React.FC = () => {
+  const { patient, healthMetrics, appointments } = usePatientData();
+  
+  return (
+    <div className="patient-dashboard grid grid-cols-1 lg:grid-cols-3 gap-6 p-6">
+      {/* Health Overview */}
+      <div className="col-span-2">
+        <HealthOverviewCard 
+          metrics={healthMetrics}
+          trends={patient.healthTrends}
+          alerts={patient.healthAlerts}
+        />
+        
+        <UpcomingAppointments appointments={appointments} />
+        
+        <MedicationReminders 
+          medications={patient.currentMedications}
+          adherenceData={patient.medicationAdherence}
+        />
+      </div>
+      
+      {/* Quick Actions */}
+      <div className="space-y-4">
+        <QuickBookingWidget />
+        <SymptomCheckerWidget />
+        <EmergencyContactsCard />
+        <HealthDocumentsAccess />
+      </div>
+    </div>
+  );
+};
+
+// Provider-Optimized Clinical Interface
+const ProviderDashboard: React.FC = () => {
+  const { provider, todaySchedule, patientQueue } = useProviderData();
+  
+  return (
+    <div className="provider-dashboard">
+      <ClinicalHeader provider={provider} />
+      
+      <div className="grid grid-cols-1 xl:grid-cols-4 gap-6 p-6">
+        {/* Patient Queue */}
+        <div className="xl:col-span-1">
+          <PatientQueue 
+            patients={patientQueue}
+            onPatientSelect={handlePatientSelect}
+          />
+        </div>
+        
+        {/* Clinical Workspace */}
+        <div className="xl:col-span-2">
+          <ClinicalWorkspace 
+            currentPatient={selectedPatient}
+            consultationMode="in-person"
+          />
+        </div>
+        
+        {/* Clinical Tools */}
+        <div className="xl:col-span-1">
+          <ClinicalDecisionSupport />
+          <DrugInteractionChecker />
+          <ClinicalGuidelines />
+        </div>
+      </div>
+    </div>
+  );
+};
+```
+
+### 2. Responsive Healthcare Design
+```typescript
+// Mobile-First Healthcare Components
+const ResponsiveMedicalCard: React.FC<MedicalCardProps> = ({ data, type }) => {
+  return (
+    <div className={`
+      medical-card 
+      ${type === 'emergency' ? 'border-red-500 bg-red-50' : 'border-gray-200'}
+      rounded-lg border-2 p-4
+      
+      /* Mobile: Stack vertically */
+      flex flex-col space-y-3
+      
+      /* Tablet: Side by side */
+      md:flex-row md:space-y-0 md:space-x-4 md:items-center
+      
+      /* Desktop: Enhanced layout */
+      lg:p-6
+    `}>
+      <MedicalIcon type={type} className="w-12 h-12 md:w-16 md:h-16" />
+      
+      <div className="flex-1">
+        <h3 className="font-semibold text-lg">{data.title}</h3>
+        <p className="text-gray-600 text-sm md:text-base">{data.description}</p>
+        
+        {type === 'emergency' && (
+          <EmergencyActions actions={data.emergencyActions} />
+        )}
+      </div>
+      
+      <MedicalDataVisualization 
+        data={data.metrics}
+        className="w-full md:w-32 lg:w-48"
+      />
+    </div>
+  );
+};
+```
+
+---
+
+## State Management for Healthcare Data
+
+### 1. Healthcare-Specific State Architecture
+```typescript
+// Healthcare Context for Patient Data
+interface HealthcareContextType {
+  // Patient Management
+  currentPatient: Patient | null;
+  patientHistory: MedicalHistory[];
+  
+  // Clinical Data
+  vitalSigns: VitalSigns[];
+  medications: Medication[];
+  allergies: Allergy[];
+  conditions: Condition[];
+  
+  // Consent & Privacy
+  activeConsents: ConsentArtefact[];
+  dataAccessLog: AccessLogEntry[];
+  
+  // Emergency Access
+  emergencyMode: boolean;
+  emergencyOverride: (reason: string) => void;
+  
+  // FHIR Operations
+  saveFHIRResource: (resource: FHIRResource) => Promise<void>;
+  linkCareContext: (contextId: string) => Promise<void>;
+}
+
+// Clinical Decision Support State
+interface ClinicalDSSContextType {
+  // Decision Support
+  recommendations: ClinicalRecommendation[];
+  drugInteractions: DrugInteraction[];
+  clinicalAlerts: ClinicalAlert[];
+  
+  // Guidelines & Protocols
+  applicableGuidelines: ClinicalGuideline[];
+  treatmentProtocols: TreatmentProtocol[];
+  
+  // Quality Metrics
+  qualityIndicators: QualityMetric[];
+  outcomeTracking: OutcomeData[];
+}
+```
+
+### 2. FHIR-Compliant Data Fetching
+```typescript
+// Custom hooks for FHIR resource management
+export const useFHIRResource = <T extends FHIRResource>(
+  resourceType: string,
+  resourceId: string,
+  patientId?: string
+) => {
+  return useQuery({
+    queryKey: ['fhir', resourceType, resourceId, patientId],
+    queryFn: async () => {
+      const resource = await fhirService.getResource<T>(resourceType, resourceId);
+      
+      // Validate FHIR structure
+      if (!validateFHIRResource(resource)) {
+        throw new Error('Invalid FHIR resource structure');
+      }
+      
+      // Check patient consent for data access
+      if (patientId && !await checkPatientConsent(patientId, resourceType)) {
+        throw new Error('Patient consent required for data access');
+      }
+      
+      return resource;
+    },
+    staleTime: 10 * 60 * 1000, // 10 minutes for medical data
+    cacheTime: 30 * 60 * 1000, // 30 minutes cache
+  });
+};
+
+// Mutation for creating FHIR resources
+export const useCreateFHIRResource = () => {
+  const queryClient = useQueryClient();
+  
+  return useMutation({
+    mutationFn: async ({ resource, patientConsent }: {
+      resource: FHIRResource;
+      patientConsent: boolean;
+    }) => {
+      // Validate consent before creating resource
+      if (!patientConsent) {
+        throw new Error('Patient consent required');
+      }
+      
+      // Validate FHIR structure
+      if (!validateFHIRResource(resource)) {
+        throw new Error('Invalid FHIR resource structure');
+      }
+      
+      return await fhirService.createResource(resource);
+    },
+    onSuccess: (data, variables) => {
+      // Update cache with new resource
+      queryClient.setQueryData(
+        ['fhir', data.resourceType, data.id],
+        data
+      );
+      
+      // Invalidate related queries
+      queryClient.invalidateQueries(['patient', variables.resource.subject?.reference]);
+    },
+  });
+};
+```
+
+---
+
+## Healthcare-Focused Styling Standards
+
+### 1. Medical Design System
+```typescript
+// Healthcare-specific design tokens
+export const healthcareDesignTokens = {
+  colors: {
+    // Medical Specialties
+    cardiology: '#e53e3e',      // Heart/Cardio - Red
+    neurology: '#805ad5',       // Brain/Neuro - Purple  
+    orthopedics: '#38a169',     // Bones/Ortho - Green
+    pediatrics: '#3182ce',      // Children - Blue
+    oncology: '#d69e2e',        // Cancer - Orange
+    emergency: '#e53e3e',       // Emergency - Urgent Red
+    
+    // Medical Status
+    critical: '#e53e3e',        // Critical condition
+    stable: '#38a169',          // Stable condition
+    improving: '#3182ce',       // Improving condition
+    deteriorating: '#ed8936',   // Worsening condition
+    
+    // Healthcare Actions
+    approved: '#38a169',        // Insurance approved
+    pending: '#d69e2e',         // Pending approval
+    denied: '#e53e3e',          // Claim denied
+    
+    // Drug Classifications
+    prescription: '#805ad5',     // Prescription drugs
+    otc: '#3182ce',             // Over-the-counter
+    controlled: '#e53e3e',      // Controlled substances
+    supplement: '#38a169',      // Supplements
+  },
+  
+  spacing: {
+    // Healthcare-optimized spacing
+    pill: '0.125rem',           // Medication pill spacing
+    vital: '0.25rem',           // Vital signs spacing
+    clinical: '0.5rem',         // Clinical data spacing
+    emergency: '1rem',          // Emergency info spacing
+  },
+  
+  typography: {
+    medical: {
+      fontFamily: ['Source Sans Pro', 'system-ui', 'sans-serif'],
+      sizes: {
+        vital: '1.5rem',        // Vital signs display
+        medication: '1rem',     // Medication names
+        diagnosis: '1.25rem',   // Diagnosis display
+        clinical: '0.875rem',   // Clinical notes
+      },
+    },
+  },
+  
+  shadows: {
+    medical: '0 2px 8px rgba(0, 0, 0, 0.1)',
+    emergency: '0 4px 16px rgba(229, 62, 62, 0.3)',
+    success: '0 2px 8px rgba(56, 161, 105, 0.2)',
+  },
+};
+```
+
+### 2. Healthcare Component Styling
+```typescript
+// Medical Status Indicators
+const MedicalStatusBadge = styled.div<{ status: MedicalStatus }>`
+  display: inline-flex;
+  align-items: center;
+  padding: ${({ theme }) => `${theme.spacing.pill} ${theme.spacing.clinical}`};
+  border-radius: 9999px;
+  font-size: ${({ theme }) => theme.typography.medical.sizes.clinical};
+  font-weight: 600;
+  
+  ${({ status, theme }) => {
+    switch (status) {
+      case 'critical':
+        return css`
+          background-color: ${theme.colors.critical}20;
+          color: ${theme.colors.critical};
+          border: 1px solid ${theme.colors.critical}40;
+        `;
+      case 'stable':
+        return css`
+          background-color: ${theme.colors.stable}20;
+          color: ${theme.colors.stable};
+          border: 1px solid ${theme.colors.stable}40;
+        `;
+      case 'emergency':
+        return css`
+          background-color: ${theme.colors.emergency};
+          color: white;
+          box-shadow: ${theme.shadows.emergency};
+          animation: pulse 2s infinite;
+        `;
+      default:
+        return css`
+          background-color: ${theme.colors.pending}20;
+          color: ${theme.colors.pending};
+        `;
+    }
+  }}
+`;
+
+// Emergency Alert Styling
+const EmergencyAlert = styled.div`
+  background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
+  border: 2px solid #ef4444;
+  border-radius: 8px;
+  padding: 1rem;
+  margin: 1rem 0;
+  box-shadow: 0 4px 16px rgba(239, 68, 68, 0.3);
+  
+  &::before {
+    content: '🚨';
+    font-size: 1.5rem;
+    margin-right: 0.5rem;
+  }
+  
+  @keyframes pulse {
+    0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); }
+    70% { box-shadow: 0 0 0 10px rgba(239, 68, 68, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+  }
+  
+  animation: pulse 2s infinite;
+`;
+```
+
+---
+
+## Medical Data Visualization
+
+### 1. Healthcare Charts & Graphs
+```typescript
+// Vital Signs Trend Chart
+const VitalSignsChart: React.FC<VitalSignsChartProps> = ({ 
+  data, 
+  vitalType, 
+  timeRange 
+}) => {
+  const chartConfig = {
+    responsive: true,
+    plugins: {
+      title: {
+        display: true,
+        text: `${vitalType} Trends - ${timeRange}`,
+        font: { size: 16, weight: 'bold' }
+      },
+      legend: {
+        position: 'top' as const,
+      },
+    },
+    scales: {
+      y: {
+        beginAtZero: false,
+        grid: {
+          color: 'rgba(0, 0, 0, 0.1)',
+        },
+        ticks: {
+          callback: function(value: any) {
+            return vitalType === 'bloodPressure' 
+              ? `${value} mmHg` 
+              : `${value} ${getVitalUnit(vitalType)}`;
+          }
+        }
+      },
+      x: {
+        grid: {
+          color: 'rgba(0, 0, 0, 0.1)',
+        },
+      }
+    },
+    elements: {
+      point: {
+        radius: 4,
+        hoverRadius: 6,
+      },
+      line: {
+        borderWidth: 2,
+        tension: 0.1,
+      }
+    }
+  };
+
+  const chartData = {
+    labels: data.map(d => format(new Date(d.timestamp), 'MMM dd')),
+    datasets: [
+      {
+        label: vitalType,
+        data: data.map(d => d.value),
+        borderColor: getVitalColor(vitalType),
+        backgroundColor: `${getVitalColor(vitalType)}20`,
+        fill: true,
+      },
+      // Add normal range bands
+      {
+        label: 'Normal Range',
+        data: data.map(() => getNormalRange(vitalType).upper),
+        borderColor: '#10b981',
+        borderDash: [5, 5],
+        pointRadius: 0,
+        fill: false,
+      }
+    ]
+  };
+
+  return (
+    <div className="vital-signs-chart bg-white p-6 rounded-lg shadow">
+      <Line data={chartData} options={chartConfig} />
+      
+      <VitalSignsLegend vitalType={vitalType} />
+      <AbnormalValueAlerts data={data} vitalType={vitalType} />
+    </div>
+  );
+};
+
+// Health Metrics Dashboard
+const HealthMetricsDashboard: React.FC<{ patientId: string }> = ({ 
+  patientId 
+}) => {
+  const { data: healthMetrics } = useHealthMetrics(patientId);
+  
+  return (
+    <div className="health-metrics-dashboard grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <MetricCard
+        title="Blood Pressure"
+        value={healthMetrics.bloodPressure.latest}
+        trend={healthMetrics.bloodPressure.trend}
+        unit="mmHg"
+        status={getHealthStatus(healthMetrics.bloodPressure.latest, 'bloodPressure')}
+        icon="❤️"
+      />
+      
+      <MetricCard
+        title="Heart Rate"
+        value={healthMetrics.heartRate.latest}
+        trend={healthMetrics.heartRate.trend}
+        unit="bpm"
+        status={getHealthStatus(healthMetrics.heartRate.latest, 'heartRate')}
+        icon="💓"
+      />
+      
+      <MetricCard
+        title="Blood Sugar"
+        value={healthMetrics.bloodSugar.latest}
+        trend={healthMetrics.bloodSugar.trend}
+        unit="mg/dL"
+        status={getHealthStatus(healthMetrics.bloodSugar.latest, 'bloodSugar')}
+        icon="🩸"
+      />
+      
+      <MetricCard
+        title="BMI"
+        value={healthMetrics.bmi.latest}
+        trend={healthMetrics.bmi.trend}
+        unit="kg/m²"
+        status={getHealthStatus(healthMetrics.bmi.latest, 'bmi')}
+        icon="⚖️"
+      />
+    </div>
+  );
+};
+```
+
+### 2. Medical Timeline Visualization
+```typescript
+// Patient Medical Timeline
+const MedicalTimeline: React.FC<{ patientId: string }> = ({ patientId }) => {
+  const { data: timeline } = useMedicalHistory(patientId);
+  
+  return (
+    <div className="medical-timeline">
+      <h3 className="text-xl font-semibold mb-6">Medical History Timeline</h3>
+      
+      <div className="timeline-container relative">
+        {/* Timeline line */}
+        <div className="absolute left-4 top-0 bottom-0 w-0.5 bg-gray-300"></div>
+        
+        {timeline.map((event, index) => (
+          <TimelineEvent
+            key={event.id}
+            event={event}
+            index={index}
+            isLatest={index === 0}
+          />
+        ))}
+      </div>
+    </div>
+  );
+};
+
+const TimelineEvent: React.FC<TimelineEventProps> = ({ 
+  event, 
+  index, 
+  isLatest 
+}) => {
+  const getEventIcon = (type: string) => {
+    switch (type) {
+      case 'diagnosis': return '🔍';
+      case 'treatment': return '💊';
+      case 'surgery': return '🏥';
+      case 'consultation': return '👨‍⚕️';
+      default: return '📋';
+    }
+  };
+
+  return (
+    <div className={`timeline-event flex items-start space-x-4 pb-8 ${
+      isLatest ? 'text-blue-600' : 'text-gray-600'
+    }`}>
+      {/* Timeline marker */}
+      <div className={`timeline-marker relative z-10 flex items-center justify-center w-8 h-8 rounded-full ${
+        isLatest ? 'bg-blue-100 border-2 border-blue-500' : 'bg-gray-100 border-2 border-gray-300'
+      }`}>
+        <span className="text-sm">{getEventIcon(event.type)}</span>
+      </div>
+      
+      {/* Event content */}
+      <div className="timeline-content flex-1 min-w-0">
+        <div className="flex items-center justify-between">
+          <h4 className="font-medium">{event.title}</h4>
+          <span className="text-sm text-gray-500">
+            {format(new Date(event.date), 'MMM dd, yyyy')}
+          </span>
+        </div>
+        
+        <p className="text-sm mt-1">{event.description}</p>
+        
+        {event.provider && (
+          <p className="text-xs text-gray-500 mt-2">
+            Provider: {event.provider.name}
+          </p>
+        )}
+        
+        {event.attachments && event.attachments.length > 0 && (
+          <div className="flex gap-2 mt-3">
+            {event.attachments.map((attachment) => (
+              <AttachmentPreview key={attachment.id} attachment={attachment} />
+            ))}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};
+```
+
+Now I'll continue with the remaining sections and then move to the final .md file. Let me update the last .md file in our sequence.
+
+<read_file>
+<path>blueprint/08-optimized-react-code-guidelines.md</path>
 
 ### 2. Component Standards
 - **Single Responsibility**: Each component has one clear purpose

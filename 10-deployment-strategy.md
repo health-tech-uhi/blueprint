@@ -1,123 +1,223 @@
-# **Health Tech Platform Deployment Strategy**
+# **ABDM-Compliant Healthcare Platform Deployment Strategy**
 
 ## **Table of Contents**
 1. [Overview](#overview)
-2. [Architecture Summary](#architecture-summary)
-3. [Database Deployment](#database-deployment)
-4. [Microservices Deployment](#microservices-deployment)
-5. [Frontend Deployment](#frontend-deployment)
-6. [Mobile & Desktop Clients](#mobile--desktop-clients)
-7. [Networking & Security](#networking--security)
-8. [Monitoring & Observability](#monitoring--observability)
-9. [CI/CD Pipeline](#cicd-pipeline)
-10. [Backup & Disaster Recovery](#backup--disaster-recovery)
-11. [Deployment Workflows](#deployment-workflows)
-12. [Resource Planning](#resource-planning)
-13. [Security Considerations](#security-considerations)
-14. [Troubleshooting & Maintenance](#troubleshooting--maintenance)
+2. [ABDM Ecosystem Architecture](#abdm-ecosystem-architecture)
+3. [Healthcare Database Deployment](#healthcare-database-deployment)
+4. [ABDM-Compliant Microservices Deployment](#abdm-compliant-microservices-deployment)
+5. [Healthcare Frontend Deployment](#healthcare-frontend-deployment)
+6. [Mobile & Desktop Healthcare Clients](#mobile--desktop-healthcare-clients)
+7. [Healthcare Networking & Security](#healthcare-networking--security)
+8. [Healthcare Monitoring & Observability](#healthcare-monitoring--observability)
+9. [ABDM-Compliant CI/CD Pipeline](#abdm-compliant-cicd-pipeline)
+10. [Healthcare Backup & Disaster Recovery](#healthcare-backup--disaster-recovery)
+11. [ABDM Deployment Workflows](#abdm-deployment-workflows)
+12. [Healthcare Resource Planning](#healthcare-resource-planning)
+13. [Healthcare Security & Compliance](#healthcare-security--compliance)
+14. [ABDM Troubleshooting & Maintenance](#abdm-troubleshooting--maintenance)
+15. [ABDM Sandbox Integration](#abdm-sandbox-integration)
 
 ---
 
 ## **Overview**
 
-This document outlines the comprehensive deployment strategy for the health tech platform, focusing on a Kubernetes-based microservices architecture with self-hosted Supabase and CDN-based frontend delivery.
+This document outlines the comprehensive deployment strategy for the ABDM-compliant healthcare platform, focusing on a Kubernetes-based microservices architecture with healthcare-grade security, FHIR R4 compliance, and full integration with Ayushman Bharat Digital Mission (ABDM) building blocks.
 
 ### **Key Architectural Decisions**
-- **Backend Communication:** Pure gRPC using Tonic framework for all microservice-to-microservice communication
-- **Frontend Communication:** REST APIs from all clients (web, mobile, desktop) to Backend-for-Frontend (BFF)
-- **Database:** Self-hosted Supabase within the Kubernetes cluster
-- **Web Frontend:** Static assets deployed via CDN for optimal global performance
-- **Mobile/Desktop:** Native apps distributed through standard channels
+- **ABDM Compliance:** Full integration with ABHA, HPR, HFR, UHI Gateway, and NHCX
+- **Healthcare Standards:** FHIR R4, HL7, SNOMED CT, ICD-10, LOINC compliance
+- **Backend Communication:** Pure gRPC using Tonic framework with healthcare-grade encryption
+- **Frontend Communication:** REST APIs with healthcare data protection
+- **Database:** Self-hosted Supabase with FHIR data store and audit logging
+- **Web Frontend:** Healthcare-optimized static assets with offline capabilities
+- **Mobile/Desktop:** ABDM-compliant native apps with biometric authentication
+- **Security:** Healthcare-grade encryption (AES-256, TLS 1.3) and audit trails
+- **Compliance:** HIPAA-equivalent data protection and regulatory compliance
 
 ---
 
-## **Architecture Summary**
+## **ABDM Ecosystem Architecture**
 
 ```mermaid
 graph TB
     subgraph "CDN Layer"
-        CDN[CDN<br/>React Web App<br/>Static Assets]
+        CDN[Healthcare CDN<br/>React Web App + PWA<br/>Offline Healthcare Assets]
     end
     
-    subgraph "Client Applications"
-        IOS[iOS App]
-        ANDROID[Android App]
-        DESKTOP[Desktop App<br/>Electron/Tauri]
+    subgraph "ABDM-Compliant Client Applications"
+        IOS[iOS Healthcare App<br/>Biometric Auth + ABHA]
+        ANDROID[Android Healthcare App<br/>Biometric Auth + ABHA]
+        DESKTOP[Desktop Healthcare App<br/>Electron/Tauri + Security]
+        PWA[Progressive Web App<br/>Offline Healthcare Capabilities]
     end
     
-    subgraph "Kubernetes Cluster"
-        subgraph "Ingress Layer"
-            INGRESS[HTTPS Ingress<br/>Load Balancer]
+    subgraph "Kubernetes Healthcare Cluster"
+        subgraph "Healthcare Ingress Layer"
+            INGRESS[HTTPS Ingress + WAF<br/>Healthcare Load Balancer]
+            API_GW[API Gateway<br/>Rate Limiting + Health Data Protection]
         end
         
-        subgraph "Backend Services"
-            BFF[BFF Service<br/>REST API Gateway]
-            IAM[IAM Service<br/>gRPC]
-            ORG[Org Management<br/>gRPC]
-            APT[Appointment Service<br/>gRPC]
-            PAY[Payment Service<br/>gRPC]
-            NOT[Notification Service<br/>gRPC]
-            DISC[Discussion Forum<br/>gRPC]
-            EHR[EHR Service<br/>gRPC + FHIR R4]
-            UHI_GW[UHI Gateway<br/>gRPC + ed25519]
-            ANALYTICS[Analytics Service<br/>gRPC + GraphQL]
+        subgraph "ABDM Compliance Layer"
+            ABHA[ABHA Service<br/>Health ID Management + Verification]
+            UHI_GW[UHI Gateway<br/>Protocol + ed25519 Signing]
+            EHR[EHR Service<br/>FHIR R4 + Clinical Data]
+            CONSENT[Consent Manager<br/>Granular Health Data Permissions]
+            ANALYTICS[Analytics Service<br/>GraphQL + Healthcare Insights]
         end
         
-        subgraph "Data Layer"
-            SUPA[Self-Hosted Supabase<br/>PostgreSQL + Auth + Storage]
-            REDIS[Redis Cache]
+        subgraph "Healthcare Management Services"
+            BFF[BFF Service<br/>REST API Gateway + Health Data]
+            IAM[IAM Service<br/>Multi-factor + Biometric Auth]
+            ORG[Organization Management<br/>HFR Integration + Facilities]
+            HPR[Healthcare Professional Registry<br/>Credential Verification]
+            APT[Appointment Service<br/>UHI Compliant Booking]
+            TELE[Teleconsultation Service<br/>Video + Session Management]
+            CHRONIC[Chronic Care Management<br/>Disease Monitoring + AI]
         end
         
-        subgraph "Observability"
-            PROM[Prometheus]
-            GRAF[Grafana]
-            JAEGER[Jaeger]
-            LOKI[Loki]
+        subgraph "Clinical & Operational Services"
+            CDX[Clinical Decision Support<br/>AI Diagnostics + Guidelines]
+            PHARM[Telepharmacy Service<br/>Medication + Drug Interactions]
+            LAB[Laboratory Integration<br/>Diagnostic Reports + FHIR]
+            IMAGING[Medical Imaging<br/>DICOM + FHIR Integration]
+            EMERGENCY[Emergency Services<br/>Critical Care Coordination]
+        end
+        
+        subgraph "Financial & Administrative Services"
+            NHCX[NHCX Integration<br/>Claims + Preauthorization]
+            PAY[Payment Service<br/>Multi-gateway + Insurance]
+            INS[Insurance Management<br/>Coverage + Verification]
+            BILLING[Billing & Invoicing<br/>Automated Healthcare Billing]
+            NOT[Notification Service<br/>Multi-channel Health Alerts]
+        end
+        
+        subgraph "Healthcare Data Layer"
+            SUPA[Supabase PostgreSQL<br/>Encrypted + RLS + Audit]
+            REDIS[Redis Cluster<br/>Session + Healthcare Cache]
+            FHIR_STORE[FHIR Data Store<br/>Clinical Documents + Standards]
+            AUDIT_LOG[Audit Logs<br/>Healthcare Compliance Tracking]
+            FILE_STORE[Encrypted File Storage<br/>Medical Documents + Images]
+        end
+        
+        subgraph "Healthcare Observability"
+            PROM[Prometheus<br/>Healthcare Metrics]
+            GRAF[Grafana<br/>Healthcare Dashboards]
+            JAEGER[Jaeger<br/>Clinical Workflow Tracing]
+            LOKI[Loki<br/>Healthcare Audit Logs]
         end
     end
     
-    subgraph "External Services"
-        UHI[UHI Gateway]
-        PAYMENT_GW[Payment Gateways]
-        SMS[SMS/Email Providers]
+    subgraph "ABDM External Ecosystem"
+        ABDM_GATEWAY[ABDM Gateway<br/>Government Integration]
+        GOVT_REG[Government Registries<br/>HFR + HPR + ABHA Verification]
+        UHI_NET[UHI Network<br/>Healthcare Providers]
+        NHCX_NET[NHCX Network<br/>Insurance Providers]
+        HOSPITAL_NET[Hospital EMR Systems<br/>Integration Partners]
+        PHARMACY_NET[Pharmacy Networks<br/>Medication Providers]
+        DIAGNOSTIC_NET[Diagnostic Centers<br/>Lab Partners]
     end
     
-    CDN -->|HTTPS REST| INGRESS
-    IOS -->|HTTPS REST| INGRESS
-    ANDROID -->|HTTPS REST| INGRESS
-    DESKTOP -->|HTTPS REST| INGRESS
+    subgraph "Healthcare External Services"
+        FACE_AUTH[Face Authentication<br/>Biometric Verification]
+        SMS_HEALTH[SMS/Email Providers<br/>Healthcare Notifications]
+        PAYMENT_HEALTH[Payment Gateways<br/>Healthcare Billing]
+        EMERGENCY_SYS[Emergency Systems<br/>Ambulance + Hospitals]
+    end
     
-    INGRESS --> BFF
+    %% Client Connections
+    CDN -->|HTTPS + Health Data Protection| INGRESS
+    IOS -->|HTTPS + Biometric + ABHA| INGRESS
+    ANDROID -->|HTTPS + Biometric + ABHA| INGRESS
+    DESKTOP -->|HTTPS + Security| INGRESS
+    PWA -->|HTTPS + Offline Sync| INGRESS
     
-    BFF -.->|gRPC| IAM
-    BFF -.->|gRPC| ORG
-    BFF -.->|gRPC| APT
-    BFF -.->|gRPC| PAY
-    BFF -.->|gRPC| NOT
-    BFF -.->|gRPC| DISC
-    BFF -.->|gRPC| EHR
-    BFF -.->|gRPC| UHI_GW
-    BFF -.->|gRPC| ANALYTICS
+    INGRESS --> API_GW
+    API_GW --> BFF
     
+    %% ABDM Core Service Connections
+    BFF --> ABHA
+    BFF --> UHI_GW
+    BFF --> EHR
+    BFF --> CONSENT
+    BFF --> ANALYTICS
+    
+    %% Healthcare Management Connections
+    BFF --> IAM
+    BFF --> ORG
+    BFF --> HPR
+    BFF --> APT
+    BFF --> TELE
+    BFF --> CHRONIC
+    
+    %% Clinical Service Connections
+    APT --> CDX
+    TELE --> CDX
+    CHRONIC --> CDX
+    CDX --> PHARM
+    CDX --> LAB
+    CDX --> IMAGING
+    EMERGENCY --> CDX
+    
+    %% Financial Service Connections
+    APT --> NHCX
+    APT --> PAY
+    PAY --> INS
+    PAY --> BILLING
+    BILLING --> NHCX
+    
+    %% Data Layer Connections
+    ABHA --> SUPA
+    EHR --> FHIR_STORE
+    CONSENT --> SUPA
     IAM --> SUPA
     ORG --> SUPA
+    HPR --> SUPA
     APT --> SUPA
+    TELE --> SUPA
+    CHRONIC --> SUPA
+    CDX --> FHIR_STORE
+    PHARM --> SUPA
+    LAB --> FHIR_STORE
+    IMAGING --> FHIR_STORE
+    EMERGENCY --> SUPA
+    NHCX --> SUPA
     PAY --> SUPA
+    INS --> SUPA
+    BILLING --> SUPA
     NOT --> REDIS
-    DISC --> SUPA
-    EHR --> SUPA
-    UHI_GW --> SUPA
-    ANALYTICS --> SUPA
-    ANALYTICS --> REDIS
-    
     BFF --> REDIS
+    ANALYTICS --> FHIR_STORE
     
-    ORG --> UHI
-    PAY --> PAYMENT_GW
-    NOT --> SMS
-    UHI_GW --> UHI
-    EHR -.->|FHIR R4| UHI_GW
+    %% File Storage
+    EHR --> FILE_STORE
+    LAB --> FILE_STORE
+    IMAGING --> FILE_STORE
     
+    %% Audit Logging
+    IAM --> AUDIT_LOG
+    EHR --> AUDIT_LOG
+    CONSENT --> AUDIT_LOG
+    NHCX --> AUDIT_LOG
+    
+    %% ABDM Ecosystem Integration
+    ABHA --> ABDM_GATEWAY
+    HPR --> GOVT_REG
+    ORG --> GOVT_REG
+    UHI_GW --> UHI_NET
+    NHCX --> NHCX_NET
+    
+    %% External Healthcare Network
+    ORG --> HOSPITAL_NET
+    PHARM --> PHARMACY_NET
+    LAB --> DIAGNOSTIC_NET
+    EMERGENCY --> EMERGENCY_SYS
+    
+    %% External Service Integration
+    ABHA --> FACE_AUTH
+    NOT --> SMS_HEALTH
+    PAY --> PAYMENT_HEALTH
+    
+    %% Monitoring Connections
     PROM -.-> GRAF
     JAEGER -.-> GRAF
     LOKI -.-> GRAF
