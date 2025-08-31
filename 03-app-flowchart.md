@@ -25,6 +25,7 @@ graph TB
         EHR[EHR Service<br/>FHIR R4 Compliant]
         CONSENT[Consent Manager<br/>Granular Permissions]
         ANALYTICS[Analytics Service<br/>GraphQL + Healthcare Insights]
+        HFR_SVC[Health Facility Registry Service<br/>Facility Registration & Management]
     end
 
     %% Core Healthcare Services
@@ -35,6 +36,8 @@ graph TB
         APT[Appointment Management<br/>UHI Compliant Booking]
         TELE[Teleconsultation Service<br/>Video + Session Management]
         CHRONIC[Chronic Care Management<br/>Disease Monitoring]
+        DISCUSSION[Discussion Forum Service<br/>Community + Patient Communication]
+        SUBSCRIPTION[Subscription Service<br/>Billing Cycles + Service Tiers]
     end
 
     %% Clinical & Operational Services
@@ -53,6 +56,11 @@ graph TB
         INS[Insurance Management<br/>Coverage Verification]
         BILLING[Billing & Invoicing<br/>Automated Processing]
         NOT[Notification Service<br/>Multi-channel Alerts]
+    end
+
+    %% Infrastructure & Deployment Services
+    subgraph "Infrastructure & Operations"
+        DEPLOY[Deployment Service<br/>Container Orchestration + Monitoring]
     end
 
     %% Data & Storage Layer
@@ -100,6 +108,9 @@ graph TB
     BFF --> HPR
     BFF --> APT
     BFF --> TELE
+    BFF --> HFR_SVC
+    BFF --> DISCUSSION
+    BFF --> SUBSCRIPTION
 
     %% Healthcare Service Connections
     APT --> CDX
@@ -138,6 +149,11 @@ graph TB
     NOT --> REDIS
     BFF --> REDIS
     ANALYTICS --> FHIR_STORE
+    HFR_SVC --> SUPA
+    DISCUSSION --> SUPA
+    SUBSCRIPTION --> SUPA
+    CHRONIC --> FHIR_STORE
+    DEPLOY --> REDIS
     
     %% File Storage
     EHR --> FILE_STORE
@@ -418,7 +434,7 @@ sequenceDiagram
     participant UHI_Gateway
     participant Provider_Network
     participant HFR_Registry
-    parameter Insurance_Service
+    participant Insurance_Service
     participant NHCX_Gateway
     participant Payment_Service
     participant Consent_Manager
